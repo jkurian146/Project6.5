@@ -19,13 +19,13 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
 
   private final StrategyType strategyType;
   private final Player player1;
-  private final Player player2;
+  private Player player2;
 
   public ReversiHexModelAI(StrategyType strategyType) {
     super();
     this.strategyType = strategyType;
     this.player1 = new Player(PlayerTurn.PLAYER1);
-    this.player2 = createAI();
+    //this.player2 = createAI();
   }
 
   private Player createAI() {
@@ -52,12 +52,22 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
 
   private void moveNonAi(int x, int y) {
     super.makeMove(x,y);
+    if (this.player2 == null) {
+      this.player2 = createAI();
+    }
   }
 
   private void moveAi() {
     IStrategy iStrategy = this.player2.getIStrategy();
     List<Integer> aiMove = iStrategy.executeStrategy();
-    if (aiMove.isEmpty()) {
+    boolean inBounds = true;
+    try {
+      this.getDiscAt(aiMove.get(0),aiMove.get(1));
+    }
+    catch (IllegalArgumentException iae) {
+      inBounds = false;
+    }
+    if (!inBounds) {
       pass();
     } else {
       super.makeMove(aiMove.get(0),aiMove.get(1));

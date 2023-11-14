@@ -11,7 +11,9 @@ import discs.Disc;
 import discs.DiscColor;
 import model.ReadOnlyReversiModel;
 import model.ReversiHexModel;
+import model.ReversiHexModelAI;
 import model.ReversiModel;
+import strategy.StrategyType;
 
 public class ReversiGUI extends JFrame implements ReversiView {
   private final ReadOnlyReversiModel model;

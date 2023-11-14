@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import discs.Disc;
+import discs.DiscColor;
 import model.BoardUtils;
 import model.ReadOnlyReversiModel;
 import player.Player;
@@ -19,6 +21,7 @@ public class CornersStrategy extends AbstractStrategy {
 
   public CornersStrategy(ReadOnlyReversiModel reversiModel, PlayerTurn player, boolean isAvoidCorners) {
     super(reversiModel,player,isAvoidCorners);
+
     this.positionMoveMap = new HashMap<>();
     this.positionsForBfs = getPositionsForBFS();
     this.cornerMap = setUpCornerMap();
@@ -37,12 +40,24 @@ public class CornersStrategy extends AbstractStrategy {
       for (int j = 0; j < reversiModel.getDimensions(); j++) {
         if (i == firstRow || i == lastRow) {
           if (j != 0) {
-           if ((reversiModel.getDiscAt(i,j-1) == null && reversiModel.getDiscAt(i,j) != null) ||
-                   (reversiModel.getDiscAt(i,j+1) == null && reversiModel.getDiscAt(i,j) != null)) {
-             ArrayList<Integer> corner = new ArrayList<>(Arrays.asList(i,j));
-             res.put(1,corner);
-           }
-          }
+            boolean discFlipped = false;
+            try {
+              discFlipped = reversiModel.getDiscAt(i,j).getColor() == DiscColor.FACEDOWN;
+            } catch (IllegalArgumentException iae) {
+
+            }
+              boolean otherDiscNull = false;
+              try {
+                reversiModel.getDiscAt(i,j-1);
+                reversiModel.getDiscAt(i, j + 1);
+              } catch (IllegalArgumentException iae) {
+                otherDiscNull = true;
+              }
+             if (discFlipped && otherDiscNull)  {
+               ArrayList<Integer> corner = new ArrayList<>(Arrays.asList(i,j));
+               res.put(1,corner);
+             }
+            }
         }
         else if (i == middle && (j == 0 || j == reversiModel.getDimensions() - 1)) {
           ArrayList<Integer> corner = new ArrayList<>(Arrays.asList(i,j));

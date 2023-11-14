@@ -37,8 +37,9 @@ public class ReversiHexModelAiTests {
 
   @Test
   public void testMaximizePassesNoMoves() {
-    ReversiHexModelAI rhmai = new ReversiHexModelAI(StrategyType.AVOIDCORNER);
+    ReversiHexModelAI rhmai = new ReversiHexModelAI(StrategyType.GOFORCORNER);
     rhmai.startGame(7);
     rhmai.makeMove(2, 2);
+    ReversiGUI rg = new ReversiGUI(rhmai);
   }
 }
