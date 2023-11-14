@@ -70,7 +70,11 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
     if (!inBounds) {
       pass();
     } else {
-      super.makeMove(aiMove.get(0),aiMove.get(1));
+      try {
+        super.makeMove(aiMove.get(0), aiMove.get(1));
+      } catch (IllegalStateException ise) {
+        pass();
+      }
     }
   }
   @Override

@@ -91,4 +91,5 @@ public interface ReadOnlyReversiModel {
   DiscColor getPlayerColor(PlayerTurn player);
 
   boolean checkValidCoordinates(int x, int y);
+
 }

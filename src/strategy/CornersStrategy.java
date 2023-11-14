@@ -8,6 +8,8 @@ import java.util.List;
 import discs.Disc;
 import discs.DiscColor;
 import model.BoardUtils;
+import model.MoveDirection;
+import model.MoveRules;
 import model.ReadOnlyReversiModel;
 import player.Player;
 import player.PlayerTurn;
@@ -32,36 +34,32 @@ public class CornersStrategy extends AbstractStrategy {
     return false;
   }
   private HashMap<Integer, List<Integer>> setUpCornerMap() {
-    int firstRow = 0;
-    int middle = reversiModel.getDimensions() / 2;
-    int lastRow = reversiModel.getDimensions() - 1;
-    HashMap<Integer,List<Integer>> res = new HashMap<>();
-    for (int i = 0; i < reversiModel.getDimensions(); i++) {
-      for (int j = 0; j < reversiModel.getDimensions(); j++) {
-        if (i == firstRow || i == lastRow) {
-          if (j != 0) {
-            boolean discFlipped = false;
-            try {
-              discFlipped = reversiModel.getDiscAt(i,j).getColor() == DiscColor.FACEDOWN;
-            } catch (IllegalArgumentException iae) {
-
-            }
-              boolean otherDiscNull = false;
-              try {
-                reversiModel.getDiscAt(i,j-1);
-                reversiModel.getDiscAt(i, j + 1);
-              } catch (IllegalArgumentException iae) {
-                otherDiscNull = true;
-              }
-             if (discFlipped && otherDiscNull)  {
-               ArrayList<Integer> corner = new ArrayList<>(Arrays.asList(i,j));
-               res.put(1,corner);
-             }
-            }
+    int first = 0;
+    int middle = this.reversiModel.getDimensions() / 2;
+    int last = this.reversiModel.getDimensions() - 1;
+    HashMap<Integer, List<Integer>> res = new HashMap<>();
+    int corner = 0;
+    for (int i = 0; i < this.reversiModel.getDimensions(); i++) {
+      for (int j = 0; j < this.reversiModel.getDimensions(); j++) {
+        boolean isCorner = false;
+        try {
+          Disc prev = reversiModel.getDiscAt(i - 1,j);
+          Disc next = reversiModel.getDiscAt(i + 1,j);
+        } catch (IllegalArgumentException iae) {
+          isCorner = true;
         }
-        else if (i == middle && (j == 0 || j == reversiModel.getDimensions() - 1)) {
-          ArrayList<Integer> corner = new ArrayList<>(Arrays.asList(i,j));
-          res.put(1,corner);
+        try {
+          if ((j == first || j == last) && isCorner) {
+            Disc curr = reversiModel.getDiscAt(i, j);
+            res.put(corner, new ArrayList<>(Arrays.asList(i, j)));
+            corner++;
+          } else if (j == middle && isCorner) {
+            Disc curr = reversiModel.getDiscAt(i, j);
+            res.put(corner, new ArrayList<>(Arrays.asList(i, j)));
+            corner++;
+          }
+        } catch (IllegalArgumentException iae) {
+
         }
       }
     }
@@ -69,47 +67,31 @@ public class CornersStrategy extends AbstractStrategy {
   }
   @Override
   public List<Integer> executeStrategy() {
-    for (List<List<Integer>> innerList: this.positionsForBfs) {
-      for (List<Integer> position: innerList) {
-        List<List<List<Integer>>> moveFromPosition = BoardUtils.bfs(reversiModel,
-                position.get(0),position.get(1));
-        // if the move doesn't contain a corner and we want to avoid corners we want to add it
-        if (!moveContainsCorners(moveFromPosition) && this.isAvoidCorners) {
-          this.updateMap(position,moveFromPosition);
+    List<List<List<Integer>>> validPositions = getPositionsForBFS();
+    for (List<List<Integer>> innerList : validPositions) {
+      // this inner list will contain all adjacent cells to a non-empty opposite color
+      for (List<Integer> position : innerList) {
+        // every possible move from a singular position
+        List<List<List<Integer>>> moveFromPosition = BoardUtils.bfs(this.reversiModel,
+                position.get(0), position.get(1));
+        // avoid cells adjacent to corners
+        if (!moveIsAdjacentToCorner(moveFromPosition) && this.isAvoidCorners) {
+          this.positionMoveMap.put(position,moveFromPosition);
         }
-        // if the move contains corners and we don't want to avoid corners we want to add it
-        else if (moveContainsCorners(moveFromPosition) && !this.isAvoidCorners) {
-          this.updateMap(position,moveFromPosition);
+        // go for corners
+        else if (!this.isAvoidCorners) {
+
         }
       }
     }
     return getLongestAndMostUpLeftFromMap(this.positionMoveMap);
   }
 
-  @Override
-  public StrategyType getStrategyType() {
-    return this.strategyType;
-  }
 
-  private void updateMap(List<Integer> pos ,List<List<List<Integer>>> move) {
-    if (this.positionMoveMap.get(pos) == null) {
-      this.positionMoveMap.put(pos,move);
-    } else {
-      List<Integer> moveInMapUpLeftMost = getUpLeftMostInMove(this.positionMoveMap.get(pos));
-      List<Integer> currMoveUpLeftMost = getUpLeftMostInMove(move);
-      int mapX = moveInMapUpLeftMost.get(0);
-      int mapY = moveInMapUpLeftMost.get(1);
-      int currX = currMoveUpLeftMost.get(0);
-      int currY = currMoveUpLeftMost.get(1);
-      if (currX < mapX || (currX == mapX && currY < mapY)) {
-        positionMoveMap.put(pos,move);
-      }
-    }
-  }
-  private boolean moveContainsCorners(List<List<List<Integer>>> moveFromPosition) {
-    for (List<List<Integer>> inner: moveFromPosition) {
-      for (List<Integer> pos: inner) {
-        if (posInMap(pos)) {
+  private boolean moveIsAdjacentToCorner(List<List<List<Integer>>> moveFromPosition) {
+    for (List<List<Integer>> innerList: moveFromPosition) {
+      for (List<Integer> position: innerList) {
+        if (adjacentPositionInMap(position)) {
           return true;
         }
       }
@@ -117,12 +99,20 @@ public class CornersStrategy extends AbstractStrategy {
     return false;
   }
 
-  private boolean posInMap(List<Integer> pos) {
-    for (List<Integer> val: this.cornerMap.values()) {
-      if (pos.equals(val)) {
+  private boolean adjacentPositionInMap(List<Integer> position) {
+    int x = position.get(0);
+    int y = position.get(1);
+    for (MoveDirection md: MoveDirection.values()) {
+      List<Integer> adjacentPos = MoveRules.applyShiftBasedOnDirection(x,y,md);
+      if (this.cornerMap.values().contains(adjacentPos)) {
         return true;
       }
     }
     return false;
   }
+  @Override
+  public StrategyType getStrategyType() {
+    return this.strategyType;
+  }
+
 }

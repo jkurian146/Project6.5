@@ -3,6 +3,8 @@ package view;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -10,16 +12,14 @@ import java.awt.image.BufferedImage;
 import discs.Disc;
 import discs.DiscColor;
 import model.ReadOnlyReversiModel;
-import model.ReversiHexModel;
 import model.ReversiHexModelAI;
-import model.ReversiModel;
 import strategy.StrategyType;
 
 public class ReversiGUI extends JFrame implements ReversiView {
   private final ReadOnlyReversiModel model;
   private final JButton[][] boardButtons;
-  private int prevX = - 1;
-  private int prevY = - 1;
+  private int prevX = -1;
+  private int prevY = -1;
 
   public ReversiGUI(ReadOnlyReversiModel model) {
     this.model = model;
@@ -62,25 +62,11 @@ public class ReversiGUI extends JFrame implements ReversiView {
             System.out.println("Disc position at " + "(" + actualJ + ", " + actualI + ")");
             Icon icon = button.getIcon();
 
-            if(!model.checkValidCoordinates(actualJ, actualI) && !(prevX == - 1 && prevY == - 1)) {
-              DiscColor originalColor = model.getDiscAt(prevX, prevY).getColor();
-              switch (originalColor) {
-                case WHITE:
-                  boardButtons[prevY][prevX].setIcon(newHexagonIcon(Color.WHITE));
-                  break;
-                case BLACK:
-                  boardButtons[prevY][prevX].setIcon(newHexagonIcon(Color.BLACK));
-                  break;
-                case FACEDOWN:
-                  boardButtons[prevY][prevX].setIcon(newHexagonIcon(Color.GRAY));
-
-                  break;
-                default:
-              }
-              prevX = - 1;
-              prevY = - 1;
+            if (!model.checkValidCoordinates(actualJ, actualI) && !(prevX == -1 && prevY == -1)) {
+              discSelectorHelper(boardButtons[prevY][prevX], prevX, prevY);
+              prevX = -1;
+              prevY = -1;
             }
-
 
             if (icon instanceof ImageIcon) {
               BufferedImage image = convertIconToBufferedImage((ImageIcon) icon);
@@ -91,92 +77,81 @@ public class ReversiGUI extends JFrame implements ReversiView {
               Color color = new Color(rgb, true);
 
               if (!model.isDiscFlipped(actualJ, actualI)) {
-                if (prevX == - 1 && prevY == - 1) {
+                if (prevX == -1 && prevY == -1) {
                   prevX = actualJ;
                   prevY = actualI;
                   button.setIcon(newHexagonIcon(Color.CYAN));
                 } else {
-                  DiscColor originalColor = model.getDiscAt(prevX, prevY).getColor();
-                  switch (originalColor) {
-                    case WHITE:
-                      boardButtons[prevY][prevX].setIcon(newHexagonIcon(Color.WHITE));
-                      break;
-                    case BLACK:
-                      boardButtons[prevY][prevX].setIcon(newHexagonIcon(Color.BLACK));
-                      break;
-                    case FACEDOWN:
-                      boardButtons[prevY][prevX].setIcon(newHexagonIcon(Color.GRAY));
-
-                      break;
-                    default:
-                  }
+                  discSelectorHelper(boardButtons[prevY][prevX], prevX, prevY);
                   button.setIcon(newHexagonIcon(Color.CYAN));
                   prevX = actualJ;
                   prevY = actualI;
                 }
               } else {
                 if (!(prevX == -1 && prevY == -1)) {
-                  DiscColor originalColor = model.getDiscAt(prevX, prevY).getColor();
-                  switch (originalColor) {
-                    case WHITE:
-                      boardButtons[prevY][prevX].setIcon(newHexagonIcon(Color.WHITE));
-                      break;
-                    case BLACK:
-                      boardButtons[prevY][prevX].setIcon(newHexagonIcon(Color.BLACK));
-                      break;
-                    case FACEDOWN:
-                      boardButtons[prevY][prevX].setIcon(newHexagonIcon(Color.GRAY));
-
-                      break;
-                    default:
-                  }
-                  prevX = - 1;
-                  prevY = - 1;
+                  discSelectorHelper(boardButtons[prevY][prevX], prevX, prevY);
+                  prevX = -1;
+                  prevY = -1;
                 }
               }
 
-              if(color.equals(Color.CYAN)) {
-                DiscColor originalColor = model.getDiscAt(actualJ, actualI).getColor();
-                switch(originalColor) {
-                  case WHITE:
-                    button.setIcon(newHexagonIcon(Color.WHITE));
-                    break;
-                  case BLACK:
-                    button.setIcon(newHexagonIcon(Color.BLACK));
-                    break;
-                  case FACEDOWN:
-                    button.setIcon(newHexagonIcon(Color.GRAY));
-
-                    break;
-                  default:
-                }
-                prevX = - 1;
-                prevY = - 1;
+              if (color.equals(Color.CYAN)) {
+                discSelectorHelper(button, actualJ, actualI);
+                prevX = -1;
+                prevY = -1;
               }
             }
           }
 
           @Override
-          public void mouseClicked(MouseEvent e) {
+          public void mouseClicked(MouseEvent e) {}
+
+          @Override
+          public void mouseReleased(MouseEvent e) {}
+
+          @Override
+          public void mouseEntered(MouseEvent e) {}
+
+          @Override
+          public void mouseExited(MouseEvent e) {}
+
+        });
+
+        boardButtons[i][j].addKeyListener(new KeyListener() {
+          @Override
+          public void keyTyped(KeyEvent e) {
 
           }
 
           @Override
-          public void mouseReleased(MouseEvent e) {
+          public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+              System.out.println("Spacebar pressed, player wishes to pass");
+              if(!(prevX == - 1 && prevY == - 1)) {
+                discSelectorHelper(boardButtons[prevY][prevX], prevX, prevY);
+                prevX = - 1;
+                prevY = - 1;
+              }
+            }
 
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+              if(!(prevX == - 1 && prevY == - 1)) {
+                System.out.println("Enter key pressed, player wishes to make a move to the disc at"
+                        + " (" + prevX + ", " + prevY + ")");
+
+                discSelectorHelper(boardButtons[prevY][prevX], prevX, prevY);
+                prevX = - 1;
+                prevY = - 1;
+              } else {
+                System.out.println("No selected disc to move to");
+              }
+            }
           }
-
 
           @Override
-          public void mouseEntered(MouseEvent e) {
+          public void keyReleased(KeyEvent e) {
 
           }
-
-          @Override
-          public void mouseExited(MouseEvent e) {
-
-          }
-
         });
         add(boardButtons[i][j]);
       }
@@ -189,6 +164,23 @@ public class ReversiGUI extends JFrame implements ReversiView {
     setSize(windowWidth, windowHeight);
     setVisible(true);
     render();
+  }
+
+  private void discSelectorHelper(JButton button, int x, int y) {
+    DiscColor originalColor = model.getDiscAt(x, y).getColor();
+    switch (originalColor) {
+      case WHITE:
+        button.setIcon(newHexagonIcon(Color.WHITE));
+        break;
+      case BLACK:
+        button.setIcon(newHexagonIcon(Color.BLACK));
+        break;
+      case FACEDOWN:
+        button.setIcon(newHexagonIcon(Color.GRAY));
+
+        break;
+      default:
+    }
   }
 
   public void render() {
@@ -255,13 +247,8 @@ public class ReversiGUI extends JFrame implements ReversiView {
   }
 
   public static void main(String[] args) {
-    ReversiModel model = new ReversiHexModel();
-    model.startGame(7);
-    model.makeMove(2,2);
-//    model.makeMove(5,2);
-//    model.makeMove(6,2);
-//    model.pass();
-//    model.makeMove(5, 4);
+    ReversiHexModelAI model = new ReversiHexModelAI(StrategyType.GOFORCORNER);
+    model.startGame(5);
 
     ReversiGUI gui = new ReversiGUI(model);
     gui.render();

@@ -212,6 +212,7 @@ public class ReversiHexModelTests {
   @Test
   public void testIsGameOverWhenPassedTwice() {
     model.startGame(7);
+    model.makeMove(2,2);
     model.pass();
     model.pass();
     Assert.assertTrue(model.isGameOver());

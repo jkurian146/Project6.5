@@ -10,6 +10,7 @@ public class MiniMaxStrategy extends AbstractStrategy {
   private final StrategyType strategyType;
   public MiniMaxStrategy(ReadOnlyReversiModel reversiModel, PlayerTurn player) {
     super(reversiModel,player);
+
     this.strategyType = StrategyType.MINIMAX;
   }
   @Override

@@ -25,7 +25,7 @@ public class ReversiHexModel extends BoardUtils implements ReversiModel {
   private final Map<PlayerTurn, DiscColor> playerColorMap;
   private int numRows;
   private int numColumns;
-  private final StringBuilder playerAction;
+  protected final StringBuilder playerAction;
   private GameState state;
 
   /**
@@ -273,16 +273,19 @@ public class ReversiHexModel extends BoardUtils implements ReversiModel {
     }
     // class invariant: only the current player can alter the board (make a move)
     // the class invariant is enforced here because we are only applying a color filter
-    // with the currnt player color
-    for (List<List<Integer>> l : moves ) {
-      l.forEach(innerList -> applyColorFilter(innerList, this.getPlayerColor(this.pt)));
+    // with the current player color
+    for (List<List<Integer>> l : moves) {
+      l.forEach(innerList -> {
+        applyColorFilter(innerList, this.getPlayerColor(this.pt));
+
+        innerList.forEach(item -> this.playerAction.append(item).append(" "));
+        this.playerAction.append(System.lineSeparator()); // Add a newline after each inner list
+      });
     }
     // class invariant: only the current player can alter the board (make a move)
     // the class invariant is enforced here because when we execute a valid move
     // we can now switch to the opposite color.
     this.togglePlayer();
-    this.playerAction.append(this.getPlayerColor(this.pt).toString())
-            .append(" moved to (").append(x).append(y).append("), ");
   }
 
   // a method that applies the current players color to newly captured cells.
@@ -292,7 +295,7 @@ public class ReversiHexModel extends BoardUtils implements ReversiModel {
 
   // determines if the last n log entries were passes
   private boolean consecutivePasses(int n) {
-    List<String> moveHistory = Arrays.asList(this.playerAction.toString().split(" "));
+    List<String> moveHistory = Arrays.asList(this.playerAction.toString().split("\n"));
     if (moveHistory.size() >= n) {
       boolean areLastNEqual = moveHistory.subList(moveHistory.size() - n, moveHistory.size())
               .stream().allMatch("pass"::equals);
@@ -469,7 +472,7 @@ public class ReversiHexModel extends BoardUtils implements ReversiModel {
     // the class invariant is enforced here because when the user wants to pass
     // we are also toggling the player.
     this.togglePlayer();
-    this.playerAction.append("pass ");
+    this.playerAction.append("pass\n");
   }
 
   // toggles a player after a move has been made or pass has been attempted
