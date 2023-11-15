@@ -475,6 +475,16 @@ public class ReversiHexModel extends BoardUtils implements ReversiModel {
     this.playerAction.append("pass\n");
   }
 
+  @Override
+  public List<ReversiModel> getGameStates() {
+    return null;
+  }
+
+  @Override
+  public List<List<Integer>> getMoves() {
+    return null;
+  }
+
   // toggles a player after a move has been made or pass has been attempted
   private void togglePlayer() {
     this.gameNotYetStarted();

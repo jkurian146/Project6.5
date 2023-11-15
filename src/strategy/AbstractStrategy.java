@@ -19,6 +19,7 @@ public abstract class AbstractStrategy implements IStrategy {
   protected final PlayerTurn player;
   protected boolean isAvoidCorners;
   private HashMap<List<Integer>, Integer> coordinateMap = new HashMap<>();
+
   public AbstractStrategy(ReadOnlyReversiModel reversiModel, PlayerTurn player) {
     this.reversiModel = reversiModel;
     this.player = player;
@@ -89,21 +90,6 @@ public abstract class AbstractStrategy implements IStrategy {
     return length;
   }
 
-  protected List<List<Integer>> getLongestFromMap(HashMap<List<Integer>, List<List<List<Integer>>>> positionMoveMap) {
-    List<List<Integer>> res = new ArrayList<>();
-    int largestMoveLength = Integer.MIN_VALUE;
-    for (Map.Entry<List<Integer>, List<List<List<Integer>>>> entry : positionMoveMap.entrySet()) {
-      int currMoveLength = this.getLengthOfMove(entry.getValue());
-      if (currMoveLength > largestMoveLength) {
-        largestMoveLength = currMoveLength;
-        res.clear();
-        res.add(entry.getKey());
-      } else if (currMoveLength == largestMoveLength) {
-        res.add(entry.getKey());
-      }
-    }
-    return res;
-  }
   protected List<Integer> getLongestAndMostUpLeftFromMap(HashMap<List<Integer>, List<List<List<Integer>>>> positionMoveMap) {
     List<List<Integer>> res = new ArrayList<>();
     int largestMoveLength = Integer.MIN_VALUE;

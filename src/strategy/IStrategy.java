@@ -2,10 +2,12 @@ package strategy;
 
 import java.util.List;
 
+import model.ReadOnlyReversiModel;
+
 public interface IStrategy {
-  boolean equals();
-  int hashCode();
+
   List<Integer> executeStrategy();
 
   StrategyType getStrategyType();
+
 }

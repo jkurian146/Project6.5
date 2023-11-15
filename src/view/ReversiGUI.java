@@ -248,26 +248,12 @@ public class ReversiGUI extends JFrame implements ReversiView {
   }
 
   public static void main(String[] args) {
-    ReversiHexModelAI model = new ReversiHexModelAI(StrategyType.GOFORCORNER);
-    //ReversiHexModel model = new ReversiHexModel();
+    //ReversiHexModelAI model = new ReversiHexModelAI(StrategyType.GOFORCORNER);
+    ReversiHexModel model = new ReversiHexModel();
     model.startGame(7);
-//    model.makeMove(2,4); // non ai
-//    //model.makeMove(1,4); // ai
-//    model.makeMove(5,2); // non ai
-//    //model.makeMove(3,1); // ai
-//    model.makeMove(3,5); // non ai
-//    model.makeMove(2,2);
-//    model.makeMove(6,4);
-//    model.makeMove(3,0);
-//    model.pass();
-//    model.makeMove(5,1);
-//    model.makeMove(5,0);
-//    model.makeMove(1,5);
-//    model.makeMove(1,2);
-//    model.makeMove(4,6);
-//    boolean isgameover = model.isGameOver();
     model.makeMove(2,4);
-    model.makeMove(1,1);
+   // model.makeMove(1,4);
+    //model.makeMove(1,5);
     ReversiGUI gui = new ReversiGUI(model);
     gui.render();
   }

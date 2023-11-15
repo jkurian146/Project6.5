@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 import discs.Disc;
 import discs.DiscColor;
 import player.PlayerTurn;
@@ -91,5 +93,9 @@ public interface ReadOnlyReversiModel {
   DiscColor getPlayerColor(PlayerTurn player);
 
   boolean checkValidCoordinates(int x, int y);
+
+  List<ReversiModel> getGameStates();
+
+  List<List<Integer>> getMoves();
 
 }

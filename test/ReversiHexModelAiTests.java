@@ -1,17 +1,13 @@
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import discs.DiscColor;
-import discs.DiscType;
 import model.GameState;
 import model.MoveDirection;
 import model.MoveRules;
-import model.ReversiHexModel;
 import model.ReversiHexModelAI;
 import model.ReversiModel;
 import strategy.StrategyType;
@@ -235,5 +231,9 @@ public class ReversiHexModelAiTests {
     ReversiModel model = new ReversiHexModelAI(StrategyType.GOFORCORNER);
     model.startGame(7);
     model.makeMove(2,4);
+    ReversiGUI gui = new ReversiGUI(model);
+    gui.render();
   }
+
+
 }

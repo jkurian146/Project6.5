@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 /**
  * Represents a ReversiModel.
  */
@@ -42,4 +44,5 @@ public interface ReversiModel extends ReadOnlyReversiModel {
    * @throws IllegalStateException if the game hasn't started yet
    */
   void pass();
+
 }

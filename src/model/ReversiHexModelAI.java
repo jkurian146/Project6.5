@@ -1,13 +1,10 @@
 
 package model;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import discs.Disc;
-import discs.DiscColor;
-import discs.DiscType;
 import player.Player;
 import player.PlayerTurn;
 import strategy.CornersStrategy;
@@ -21,12 +18,17 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
   private final StrategyType strategyType;
   private final Player player1;
   private Player player2;
+  private List<ReversiModel> gameStates;
+  private List<List<Integer>> allMoves;
+  private boolean firstRun;
 
   public ReversiHexModelAI(StrategyType strategyType) {
     super();
     this.strategyType = strategyType;
     this.player1 = new Player(PlayerTurn.PLAYER1);
-    //this.player2 = createAI();
+    this.gameStates = new ArrayList<>();
+    this.allMoves = new ArrayList<>();
+    this.firstRun = true;
   }
 
   private Player createAI() {
@@ -48,8 +50,20 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
   @Override
   public void makeMove(int x, int y) {
     if (!this.isGameOver()) {
-      this.moveNonAi(x, y);
-      this.moveAi();
+      if (this.firstRun) {
+        this.gameStates.add(this);
+        this.moveNonAi(x, y);
+        this.gameStates.add(this);
+        this.moveAi();
+        this.gameStates.add(this);
+        this.firstRun = false;
+      } else {
+        this.moveNonAi(x, y);
+        this.gameStates.add(this);
+        this.moveAi();
+        this.gameStates.add(this);
+        this.firstRun = false;
+      }
     } else {
       throw new IllegalStateException("Can't call move after game is over");
     }
@@ -57,6 +71,7 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
 
   private void moveNonAi(int x, int y) {
     super.makeMove(x,y);
+    this.allMoves.add(new ArrayList<>(Arrays.asList(x,y)));
     if (this.player2 == null) {
       this.player2 = createAI();
     }
@@ -77,6 +92,8 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
     } else {
       try {
         super.makeMove(aiMove.get(0), aiMove.get(1));
+        this.allMoves.add(new ArrayList<>(Arrays.asList(aiMove.get(0),
+                aiMove.get(1))));
       } catch (IllegalStateException | IllegalArgumentException ise) {
         this.pass();
       }
@@ -90,6 +107,17 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
     } else {
       super.pt = this.player1.getPlayerTurn();
     }
+    this.allMoves.add(new ArrayList<>(Arrays.asList(-1)));
     this.playerAction.append("pass\n");
+  }
+
+  @Override
+  public List<ReversiModel> getGameStates() {
+    return this.gameStates;
+  }
+
+  @Override
+  public List<List<Integer>> getMoves() {
+    return this.allMoves;
   }
 }

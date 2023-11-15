@@ -29,10 +29,7 @@ public class CornersStrategy extends AbstractStrategy {
     this.cornerMap = setUpCornerMap();
     this.strategyType = (isAvoidCorners) ? StrategyType.AVOIDCORNER : StrategyType.GOFORCORNER;
   }
-  @Override
-  public boolean equals() {
-    return false;
-  }
+
   private HashMap<Integer, List<Integer>> setUpCornerMap() {
     int first = 0;
     int middle = this.reversiModel.getDimensions() / 2;
@@ -115,7 +112,6 @@ public class CornersStrategy extends AbstractStrategy {
           closestDistanceToACorner = xDistance + yDistance;
           closestMoveToCorner = entry.getKey();
         } else if (xDistance + yDistance == closestDistanceToACorner) {
-
           int mapX = entry.getKey().get(0);
           int mapY = entry.getKey().get(1);
           if (currX < mapX || (currX == mapX && currY < mapY)) {
@@ -145,7 +141,7 @@ public class CornersStrategy extends AbstractStrategy {
         }
       }
     }
-    return 0;
+    return closestDistanceToACorner;
   }
   private boolean moveIsAdjacentToCorner(List<List<List<Integer>>> moveFromPosition) {
     for (List<List<Integer>> innerList: moveFromPosition) {

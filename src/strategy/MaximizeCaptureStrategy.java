@@ -18,15 +18,6 @@ public class MaximizeCaptureStrategy extends AbstractStrategy {
     super(reversiModel,player);
     this.strategyType = StrategyType.MAXIMIZE;
   }
-  @Override
-  public boolean equals() {
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return 0;
-  }
 
   @Override
   public List<Integer> executeStrategy() {
@@ -61,7 +52,6 @@ public class MaximizeCaptureStrategy extends AbstractStrategy {
 
         }
       }
-    getLongestFromMap(positionMoveMap);
     return getLongestAndMostUpLeftFromMap(positionMoveMap);
   }
 
