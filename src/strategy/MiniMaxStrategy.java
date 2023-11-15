@@ -2,13 +2,19 @@ package strategy;
 
 import java.util.List;
 import model.ReadOnlyReversiModel;
-import model.ReversiModel;
-import player.Player;
 import player.PlayerTurn;
 
+/**
+ * A 'MiniMaxStrategy' represents a strategy
+ * that identifies a human's strategy and executes the same strategy.
+ * if unidentified strategy is used default to maximizeCapture
+ */
 public class MiniMaxStrategy extends AbstractStrategy {
-
   private final StrategyType strategyType;
+
+  /**
+   * A 'MiniMaxStrategy' constructor.
+   */
   public MiniMaxStrategy(ReadOnlyReversiModel reversiModel, PlayerTurn player) {
     super(reversiModel,player);
 
@@ -22,24 +28,25 @@ public class MiniMaxStrategy extends AbstractStrategy {
     List<List<Integer>> moves = this.reversiModel.getMoves();
     List<Integer> lastMove = moves.get(moves.size() - 1);
     if (lastMove.equals(executeMaximize(getLastState))) {
-
+      return executeMaximize(this.reversiModel);
     } else if (lastMove.equals(executeAvoidCorners(getLastState))) {
-      executeAvoidCorners(this.reversiModel);
+      return executeAvoidCorners(this.reversiModel);
     } else if (lastMove.equals(executeGoForCorner(getLastState))) {
-      executeGoForCorner(this.reversiModel);
+      return executeGoForCorner(this.reversiModel);
     } else {
-      executeMaximize(this.reversiModel);
+      return executeMaximize(this.reversiModel);
     }
-    return null;
   }
 
   private static List<Integer> executeGoForCorner(ReadOnlyReversiModel reversiModel) {
-    CornersStrategy goForCorner = new CornersStrategy(reversiModel,reversiModel.currentTurn(), false);
+    CornersStrategy goForCorner = new CornersStrategy(reversiModel,reversiModel.currentTurn(),
+            false);
     return goForCorner.executeStrategy();
   }
 
   private static List<Integer> executeAvoidCorners(ReadOnlyReversiModel reversiModel) {
-    CornersStrategy avoidCorner = new CornersStrategy(reversiModel,reversiModel.currentTurn(), true);
+    CornersStrategy avoidCorner = new CornersStrategy(reversiModel,reversiModel.currentTurn(),
+            true);
     return avoidCorner.executeStrategy();
   }
 
@@ -48,10 +55,9 @@ public class MiniMaxStrategy extends AbstractStrategy {
             reversiModel.currentTurn());
     return maximizeCaptureStrategy.executeStrategy();
   }
+
   @Override
   public StrategyType getStrategyType() {
     return this.strategyType;
   }
-
-
 }

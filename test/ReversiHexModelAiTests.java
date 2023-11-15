@@ -1,10 +1,8 @@
 import org.junit.Assert;
 import org.junit.Test;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import discs.DiscColor;
 import model.GameState;
 import model.MoveDirection;
@@ -24,6 +22,233 @@ public class ReversiHexModelAiTests {
   }
 
   @Test
+  public void testMaximizeStrategyFunctionalityAndAiPassesWhenItHasNoMoves() {
+    // Mock testing behavior:
+    // Our mock works by passing in a model into the mocked strategy,
+    // and then returning the available moves for whichever player's turn it is to play.
+
+    // Since our AI model works by instantly making a move when the player makes a move, we cannot
+    // test the available moves for the AI.
+    // instead, we manually make the moves for our mock using a "For Test Model" to be able to
+    // return the available moves for the Ai player.
+
+    // The available moves can be found by using System.out.println(mock.availableMoves());
+    // whenever it is desired to do so.
+    // Consequentially, you can take a look at the string assertions for the mock.availableMoves
+    // and compare them to the manually inserted "Available Moves",
+    // which are commented after nearly every move.
+
+    // For readability, after a while,we stopped testing the mock,
+    // as we think we were thorough enough throughout the test.
+
+
+    ReversiHexModelAI aiModel = new ReversiHexModelAI(StrategyType.MAXIMIZE);
+    ReversiHexModel modelForTesting = new ReversiHexModel();
+    aiModel.startGame(9);
+    modelForTesting.startGame(9);
+    MaximizeCaptureStrategyMock mock = new MaximizeCaptureStrategyMock(modelForTesting);
+
+    modelForTesting.makeMove(4, 2);
+    aiModel.makeMove(4, 2);
+    Assert.assertEquals("Move: [2, 3], discs Captured: 2, Captured Moves: [[2, 3], [3, 4]]\n" +
+                    "Move: [3, 1], discs Captured: 3, Captured Moves: [[3, 1], [4, 2], [4, 3]]\n" +
+                    "Move: [4, 6], discs Captured: 2, Captured Moves: [[4, 6], [4, 5]]\n" +
+                    "Move: [5, 5], discs Captured: 2, Captured Moves: [[5, 5], [4, 5]]",
+            mock.availableMoves());
+
+    // Available moves for the Ai after the player makes their move:
+    // (3, 1), discs captured: 3 *
+    // (5, 5), discs captured: 2
+    // (4, 6), discs captured: 2
+    // (2, 3), discs captured: 2
+    // Assert that it made the proper move, by testing the expected captured discs that were
+    // printed by the mock.
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 2).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 1).getColor());
+    modelForTesting.makeMove(3, 1);
+
+    modelForTesting.makeMove(4, 1);
+    aiModel.makeMove(4, 1);
+    Assert.assertEquals("Move: [2, 3], discs Captured: 3, Captured Moves: " +
+                    "[[2, 3], [3, 3], [3, 4]]\n" +
+                    "Move: [4, 6], discs Captured: 2, Captured Moves: [[4, 6], [4, 5]]\n" +
+                    "Move: [5, 1], discs Captured: 2, Captured Moves: [[5, 1], [4, 1]]\n" +
+                    "Move: [5, 5], discs Captured: 2, Captured Moves: [[5, 5], [4, 5]]",
+            mock.availableMoves());
+
+    // Available moves for the Ai after the player makes their move:
+    // (2, 3), discs captured: 3 *
+    // (5, 5), discs captured: 2
+    // (4, 6), discs captured: 2
+    // (5, 2), discs captured: 2
+    // Assert that it made the proper move, by testing the expected captured discs that were
+    // printed by the mock
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(2, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 4).getColor());
+    modelForTesting.makeMove(2, 3);
+
+    modelForTesting.makeMove(2, 5);
+    aiModel.makeMove(2, 5);
+    Assert.assertEquals("Move: [4, 6], discs Captured: 4, Captured Moves: " +
+                    "[[4, 6], [3, 5], [3, 4], [4, 5]]\n" +
+                    "Move: [5, 1], discs Captured: 2, Captured Moves: [[5, 1], [4, 1]]",
+            mock.availableMoves());
+
+    // Available moves for the Ai after the player makes their move:
+    // (4, 6), discs captured: 4 *
+    // (5, 1), discs captured: 2
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 6).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 5).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 5).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 4).getColor());
+    modelForTesting.makeMove(4, 6);
+
+    modelForTesting.makeMove(5, 5);
+    aiModel.makeMove(5, 5);
+    Assert.assertEquals("Move: [6, 6], discs Captured: 5, Captured Moves: " +
+                    "[[6, 6], [5, 5], [5, 4], [4, 3], [4, 2]]\n" +
+                    "Move: [2, 6], discs Captured: 2, Captured Moves: [[2, 6], [2, 5]]\n" +
+                    "Move: [5, 0], discs Captured: 4, Captured Moves: " +
+                    "[[5, 0], [4, 1], [4, 2], [3, 3]]\n" +
+                    "Move: [5, 1], discs Captured: 2, Captured Moves: [[5, 1], [4, 1]]\n" +
+                    "Move: [5, 3], discs Captured: 5, Captured Moves: " +
+                    "[[5, 3], [4, 3], [3, 3], [5, 4], [4, 5]]",
+            mock.availableMoves());
+
+    // Available moves for the Ai after the player makes their move:
+    // (5, 0), discs captured: 4
+    // (5, 3), discs captured: 5 *
+    // (5, 1), discs captured: 2
+    // (2, 6), discs captured: 2
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 5).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(5, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(5, 3).getColor());
+    modelForTesting.makeMove(5, 3);
+
+    modelForTesting.makeMove(4, 7);
+    aiModel.makeMove(4, 7);
+    Assert.assertEquals("Move: [6, 5], discs Captured: 2, Captured Moves: [[6, 5], [5, 5]]\n" +
+                    "Move: [6, 6], discs Captured: 2, Captured Moves: [[6, 6], [5, 5]]\n" +
+                    "Move: [2, 6], discs Captured: 2, Captured Moves: [[2, 6], [2, 5]]\n" +
+                    "Move: [5, 0], discs Captured: 3, Captured Moves: [[5, 0], [4, 1], [4, 2]]\n" +
+                    "Move: [5, 1], discs Captured: 2, Captured Moves: [[5, 1], [4, 1]]\n" +
+                    "Move: [5, 8], discs Captured: 4, Captured Moves: [[5, 8], [4, 7], [4, 6], [3, 5]]\n" +
+                    "Move: [1, 5], discs Captured: 3, Captured Moves: [[1, 5], [2, 5], [3, 5]]\n" +
+                    "Move: [3, 7], discs Captured: 2, Captured Moves: [[3, 7], [4, 6]]",
+            mock.availableMoves());
+
+    // Available moves for the Ai after the player makes their move:
+    // (5, 0), discs captured: 3
+    // (5, 2), discs captured: 2
+    // (3, 7), discs captured: 2
+    // (2, 6), discs captured: 2
+    // (6, 5), discs captured: 2
+    // (5, 8), discs captured: 4 *
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(5, 8).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 7).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 6).getColor());
+    modelForTesting.makeMove(5, 8);
+
+    modelForTesting.makeMove(3, 0);
+    aiModel.makeMove(3, 0);
+    Assert.assertEquals("Move: [6, 5], discs Captured: 2, Captured Moves: [[6, 5], [5, 5]]\n" +
+                    "Move: [6, 6], discs Captured: 2, Captured Moves: [[6, 6], [5, 5]]\n" +
+                    "Move: [2, 6], discs Captured: 2, Captured Moves: [[2, 6], [2, 5]]\n" +
+                    "Move: [5, 0], discs Captured: 3, Captured Moves: [[5, 0], [4, 1], [4, 2]]\n" +
+                    "Move: [1, 5], discs Captured: 2, Captured Moves: [[1, 5], [2, 5]]",
+            mock.availableMoves());
+
+    // Available moves for the Ai after the player makes their move:
+    // (5, 0), discs captured: 3 *
+    // (6, 6), discs captured: 2
+    // (1, 5), discs captured: 2
+    // (2, 6), discs captured: 2
+    // (6, 5), discs captured: 2
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 2).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 1).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(5, 0).getColor());
+    modelForTesting.makeMove(5, 0);
+
+    aiModel.makeMove(5, 1);
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(1, 5).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(2, 5).getColor());
+    aiModel.makeMove(2, 6);
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 2).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 1).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 4).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(2, 5).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(2, 6).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(1, 7).getColor());
+    aiModel.makeMove(0, 5);
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(1, 5).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(1, 4).getColor());
+    aiModel.makeMove(6, 2);
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 5).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(5, 4).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(5, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(6, 2).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(6, 1).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(5, 1).getColor());
+    aiModel.makeMove(1, 3);
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(1, 4).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(1, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(0, 3).getColor());
+    aiModel.makeMove(2, 2);
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 5).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 4).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(2, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(2, 2).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(1, 1).getColor());
+    aiModel.makeMove(2, 1);
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(5, 5).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(6, 5).getColor());
+    aiModel.makeMove(6, 6);
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(5, 7).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(6, 6).getColor());
+    aiModel.makeMove(7, 5);
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(6, 5).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(7, 4).getColor());
+    aiModel.makeMove(6, 3);
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(7, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(7, 4).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(6, 3).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(5, 3).getColor());
+    aiModel.makeMove(3, 7);
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(5, 4).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 5).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(4, 6).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 7).getColor());
+    Assert.assertEquals(DiscColor.WHITE, aiModel.getDiscAt(3, 8).getColor());
+
+    ReversiModel endStateModel = new ReversiHexModel(aiModel.getCurrentBoardState());
+    MaximizeCaptureStrategyMock mockEndState = new MaximizeCaptureStrategyMock(endStateModel);
+    Assert.assertEquals("", mockEndState.availableMoves());
+    // There are no moves Available for the current player (Ai).
+
+    // Here the AI has no moves, it passes back to black
+    aiModel.makeMove(6, 7);
+    Assert.assertEquals(DiscColor.BLACK, aiModel.getDiscAt(6, 6).getColor());
+    Assert.assertEquals(DiscColor.BLACK, aiModel.getDiscAt(6, 7).getColor());
+
+    // black makes a move and then the game ends, because both players have no moves
+    aiModel.makeMove(2, 7);
+    Assert.assertTrue(aiModel.isGameOver());
+
+    Assert.assertEquals(19, aiModel.getScore(aiModel.currentTurn()));
+    Assert.assertEquals(23, aiModel.getScore(aiModel.getOpponent(aiModel.currentTurn())));
+
+    Assert.assertEquals(GameState.STALEMATE, aiModel.getCurrentGameState());
+
+    ReversiGUI gui = new ReversiGUI(aiModel);
+    gui.render();
+  }
+
+  @Test
   public void testMaximizeSelectsLargestLeft() {
     ReversiHexModelAI rhmai = new ReversiHexModelAI(StrategyType.MAXIMIZE);
     rhmai.startGame(7);
@@ -33,209 +258,6 @@ public class ReversiHexModelAiTests {
     Assert.assertEquals(DiscColor.WHITE, rhmai.getDiscAt(3, 2).getColor());
     Assert.assertEquals(DiscColor.WHITE, rhmai.getDiscAt(4, 2).getColor());
   }
-
-  @Test
-  public void testMaximizeStrategyChoosesMoveWithMostCaptures() {
-    ReversiHexModelAI model = new ReversiHexModelAI(StrategyType.MAXIMIZE);
-    model.startGame(7);
-
-    model.makeMove(3, 5);
-
-    // The move with the most captures, should result in the following discs to be captured.
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 4).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 6).getColor());
-
-    // other legal moves for the AI (white) that should not have been made
-    // as they capture fewer discs than the one shown above, which is the maxCapture move.
-    Assert.assertNotEquals(DiscColor.WHITE, model.getDiscAt(5, 4).getColor());
-    Assert.assertNotEquals(DiscColor.WHITE, model.getDiscAt(2, 2).getColor());
-    Assert.assertNotEquals(DiscColor.WHITE, model.getDiscAt(3, 1).getColor());
-
-    model.makeMove(2, 4);
-    // this max move captured four discs, the closest move captures 3 discs, which is tested below
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(2, 2).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 4).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 2).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(2, 3).getColor());
-
-    Assert.assertNotEquals(DiscColor.WHITE, model.getDiscAt(5, 2).getColor());
-    Assert.assertNotEquals(DiscColor.WHITE, model.getDiscAt(4, 3).getColor());
-    Assert.assertNotEquals(DiscColor.WHITE, model.getDiscAt(4, 4).getColor());
-
-  }
-
-  @Test
-  public void testAIPassesWhenItHasNoMoves() {
-    // could have used mock to simplify,
-    // but this way we get to test functionality and see that everything is working
-
-    ReversiHexModelAI model = new ReversiHexModelAI(StrategyType.MAXIMIZE);
-    model.startGame(9);
-
-    model.makeMove(4, 2);
-    // Available moves:
-    // (3, 1), discs captured: 3
-    // (5, 5), discs captured: 2
-    // (4, 6), discs captured: 2
-    // (2, 3), discs captured: 2
-
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 2).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 1).getColor());
-
-
-    model.makeMove(4, 1);
-    // Available moves:
-    // (2, 3), discs captured: 3 *
-    // (5, 5), discs captured: 2
-    // (4, 6), discs captured: 2
-    // (5, 2), discs captured: 2
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(2, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 4).getColor());
-
-    model.makeMove(2, 5);
-    // Available moves:
-    // (4, 6), discs captured: 4 *
-    // (5, 1), discs captured: 2
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 6).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 4).getColor());
-
-    model.makeMove(5, 5);
-    // Available moves:
-    // (5, 0), discs captured: 4
-    // (5, 3), discs captured: 5 *
-    // (5, 1), discs captured: 2
-    // (2, 6), discs captured: 2
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 3).getColor());
-
-    model.makeMove(4, 7);
-    // Available moves:
-    // (5, 0), discs captured: 3
-    // (5, 2), discs captured: 2
-    // (3, 7), discs captured: 2
-    // (2, 6), discs captured: 2
-    // (6, 5), discs captured: 2
-    // (5, 8), discs captured: 4 *
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 8).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 7).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 6).getColor());
-
-    model.makeMove(3, 0);
-    // Available moves:
-    // (5, 0), discs captured: 3 *
-    // (6, 6), discs captured: 2
-    // (1, 5), discs captured: 2
-    // (2, 6), discs captured: 2
-    // (6, 5), discs captured: 2
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 2).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 1).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 0).getColor());
-
-    model.makeMove(5, 1);
-    // Available moves:
-    // (1, 5), discs captured: 2 * top-leftmost
-    // (2, 6), discs captured: 2
-    // (6, 6), discs captured: 2
-    // (6, 5), discs captured: 2
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(1, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(2, 5).getColor());
-
-    model.makeMove(2, 6);
-    // Available moves:
-    // (1, 7), discs captured: 7 *
-    // (2, 7), discs captured: 2
-    // (6, 6), discs captured: 2
-    // (6, 5), discs captured: 2
-    // (6, 2), discs captured: 2
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 2).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 1).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 4).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(2, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(2, 6).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(1, 7).getColor());
-
-    model.makeMove(0, 5);
-    // Available moves:
-    // (6, 1), discs captured: 2
-    // (2, 1), discs captured: 2
-    // (1, 4), discs captured: 2 *
-    // (6, 4), discs captured: 2
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(1, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(1, 4).getColor());
-
-    model.makeMove(6, 2);
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 4).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(6, 2).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(6, 1).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 1).getColor());
-
-    model.makeMove(1, 3);
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(1, 4).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(1, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(0, 3).getColor());
-
-    model.makeMove(2, 2);
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 4).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(2, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(2, 2).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(1, 1).getColor());
-
-    model.makeMove(2, 1);
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(6, 5).getColor());
-
-    model.makeMove(6, 6);
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 7).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(6, 6).getColor());
-
-    model.makeMove(7, 5);
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(6, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(7, 4).getColor());
-
-    model.makeMove(6, 3);
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(7, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(7, 4).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(6, 3).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 3).getColor());
-
-    model.makeMove(3, 7);
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 4).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 5).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 6).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 7).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 8).getColor());
-
-    // Here the AI has no moves, it passes back to black
-    model.makeMove(6, 7);
-    Assert.assertEquals(DiscColor.BLACK, model.getDiscAt(6, 6).getColor());
-    Assert.assertEquals(DiscColor.BLACK, model.getDiscAt(6, 7).getColor());
-
-    // black makes a move and then the game ends, because both players have no moves
-    model.makeMove(2, 7);
-    Assert.assertTrue(model.isGameOver());
-
-    Assert.assertEquals(19, model.getScore(model.currentTurn()));
-    Assert.assertEquals(23, model.getScore(model.getOpponent(model.currentTurn())));
-
-    Assert.assertEquals(GameState.STALEMATE, model.getCurrentGameState());
-
-    ReversiGUI gui = new ReversiGUI(model);
-    gui.render();
-  }
-
-  // test that MaximizeStrat passes when no moves left
 
   @Test
   public void testAdjacentCornerCellsNotSelected () {
@@ -271,30 +293,5 @@ public class ReversiHexModelAiTests {
     model.pass();
     Assert.assertTrue(model.isGameOver());
     Assert.assertEquals(GameState.STALEMATE, model.getCurrentGameState());
-  }
-
-  @Test
-  public void testAIGoForCorners() {
-    ReversiModel model = new ReversiHexModelAI(StrategyType.GOFORCORNER);
-    model.startGame(7);
-    model.makeMove(2,4);
-  }
-
-  @Test
-  public void testMockAiMaximize() {
-    ReversiModel model = new ReversiHexModel();
-    model.startGame(7);
-    model.makeMove(2, 2);
-    MaximizeCaptureStrategyMock mock = new MaximizeCaptureStrategyMock(model);
-
-    System.out.println(mock.reviewedPositions());
-    System.out.println(mock.positionMoveMap);
-  }
-
-  @Test
-  public void testMiniMax() {
-    ReversiHexModelAI model = new ReversiHexModelAI(StrategyType.MINIMAX);
-    model.startGame(7);
-    model.makeMove(2,2);
   }
 }

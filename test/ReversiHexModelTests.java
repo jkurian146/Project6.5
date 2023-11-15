@@ -8,7 +8,6 @@ import discs.DiscType;
 import discs.GameDisc;
 import model.GameState;
 import model.ReversiHexModel;
-import model.ReversiHexModelAI;
 import model.ReversiModel;
 import player.PlayerTurn;
 import view.ReversiView;

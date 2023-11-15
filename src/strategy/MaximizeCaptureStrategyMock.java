@@ -63,7 +63,7 @@ public class MaximizeCaptureStrategyMock extends AbstractStrategy {
     return getLongestAndMostUpLeftFromMap(positionMoveMap);
   }
 
-  public String reviewedPositions() {
+  public String availableMoves() {
     this.executeStrategy();
     StringBuilder result = new StringBuilder();
 

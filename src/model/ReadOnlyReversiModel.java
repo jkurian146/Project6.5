@@ -6,6 +6,9 @@ import discs.Disc;
 import discs.DiscColor;
 import player.PlayerTurn;
 
+/**
+ * Represents a ReadOnlyReversiModel.
+ */
 public interface ReadOnlyReversiModel {
 
   // does a player have a legal moves

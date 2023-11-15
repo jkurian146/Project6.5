@@ -6,10 +6,22 @@ import java.util.List;
 
 import discs.DiscColor;
 
+
+/**
+ * BoardUtils is a class consisting of a series of static
+ * helper methods responsible for running a bfs at a specified
+ * coordinate.
+ */
 public class BoardUtils {
 
-
-  public static List<List<List<Integer>>> bfs(ReadOnlyReversiModel rorm, int destX, int destY) {
+  /**
+   * Runs a BFS at a specified coordinate.
+   * @param rorm the ReadOnlyReversiModel we are running the bfs on
+   * @param destX the x coordinate we want to run the bfs from
+   * @param destY the Y coordinate we want to run the bfs from
+   */
+  public static List<List<List<Integer>>> bfs(ReadOnlyReversiModel rorm,
+                                              int destX, int destY) {
     List<List<List<Integer>>> res = new ArrayList<>();
     for (MoveDirection md: MoveDirection.values()) {
       List<List<Integer>> move = bfsHelper(rorm,destX,destY,md,new ArrayList<>(),true);
@@ -22,9 +34,9 @@ public class BoardUtils {
 
   // A helper for bfs that determines coordinates for a move in a certain direction
   // returns an empty list if there are no moves for that direction
-  private static List<List<Integer>> bfsHelper(ReadOnlyReversiModel rorm, int x, int y, MoveDirection moveDirection,
-                                        List<List<Integer>> res, boolean firstPass) {
-
+  private static List<List<Integer>> bfsHelper(ReadOnlyReversiModel rorm, int x, int y,
+                                               MoveDirection moveDirection,
+                                               List<List<Integer>> res, boolean firstPass) {
     while (true) {
       res.add(Arrays.asList(x,y));
       // class invariant: only the current player can alter the board (make a move)

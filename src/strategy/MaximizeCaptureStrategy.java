@@ -1,19 +1,24 @@
 package strategy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import model.BoardUtils;
 import model.ReadOnlyReversiModel;
-import player.Player;
 import player.PlayerTurn;
 
+
+/**
+ * A 'MaximizeCaptureStrategy' represents a strategy
+ * that selects the longest move possible and then
+ * selects the most up-left move.
+ */
 public class MaximizeCaptureStrategy extends AbstractStrategy {
 
   private final StrategyType strategyType;
+
+  /**
+   * A 'MaximizeCaptureStrategy' constructor.
+   */
   public MaximizeCaptureStrategy(ReadOnlyReversiModel reversiModel, PlayerTurn player) {
     super(reversiModel,player);
     this.strategyType = StrategyType.MAXIMIZE;
@@ -23,35 +28,32 @@ public class MaximizeCaptureStrategy extends AbstractStrategy {
   public List<Integer> executeStrategy() {
     HashMap<List<Integer>, List<List<List<Integer>>>> positionMoveMap = new HashMap<>();
     List<List<Integer>> validPositions = getPositionsForBFS();
-
-      for (List<Integer> position : validPositions) {
-        List<List<List<Integer>>> moveFromPosition = BoardUtils.bfs(this.reversiModel,
-                position.get(0), position.get(1));
-        // add a position and the move set to the map if the position doesn't exist
-        if (positionMoveMap.get(position) == null) {
+    for (List<Integer> position : validPositions) {
+      List<List<List<Integer>>> moveFromPosition = BoardUtils.bfs(this.reversiModel,
+              position.get(0), position.get(1));
+      if (positionMoveMap.get(position) == null) {
           positionMoveMap.put(position, moveFromPosition);
-        } else {
-          // if a position doesn't exist get from the map and calculate which one is the longest first in case of tie
-          // choose the most up-left
-          List<List<List<Integer>>> moveInMap = positionMoveMap.get(position);
-          int lengthOfMoveInMap = getLengthOfMove(moveInMap);
-          int lengthOfMoveFromPos = getLengthOfMove(moveFromPosition);
-          if (lengthOfMoveFromPos > lengthOfMoveInMap) {
+      } else {
+        List<List<List<Integer>>> moveInMap = positionMoveMap.get(position);
+        int lengthOfMoveInMap = getLengthOfMove(moveInMap);
+        int lengthOfMoveFromPos = getLengthOfMove(moveFromPosition);
+        if (lengthOfMoveFromPos > lengthOfMoveInMap) {
             positionMoveMap.put(position, moveFromPosition);
-          } else if (lengthOfMoveFromPos == lengthOfMoveInMap) {
-            List<Integer> mapMoveMostUpLeft = getUpLeftMostInMove(moveInMap);
-            List<Integer> posMoveMostUpLeft = getUpLeftMostInMove(moveFromPosition);
-            int mapX = mapMoveMostUpLeft.get(0);
-            int mapY = mapMoveMostUpLeft.get(1);
-            int currX = posMoveMostUpLeft.get(0);
-            int currY = posMoveMostUpLeft.get(1);
-            if (currX < mapX || (currX == mapX && currY < mapY)) {
-              positionMoveMap.put(position, moveFromPosition);
-            }
-          }
-
         }
+        else if (lengthOfMoveFromPos == lengthOfMoveInMap) {
+          List<Integer> mapMoveMostUpLeft = getUpLeftMostInMove(moveInMap);
+          List<Integer> posMoveMostUpLeft = getUpLeftMostInMove(moveFromPosition);
+          int mapX = mapMoveMostUpLeft.get(0);
+          int mapY = mapMoveMostUpLeft.get(1);
+          int currX = posMoveMostUpLeft.get(0);
+          int currY = posMoveMostUpLeft.get(1);
+          if (currX < mapX || (currX == mapX && currY < mapY)) {
+            positionMoveMap.put(position, moveFromPosition);
+          }
+        }
+
       }
+    }
     return getLongestAndMostUpLeftFromMap(positionMoveMap);
   }
 

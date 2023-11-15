@@ -13,6 +13,9 @@ import model.MoveRules;
 import model.ReadOnlyReversiModel;
 import player.PlayerTurn;
 
+/**
+ * A Utility class that holds important operations for a strategy to make decesions.
+ */
 public abstract class AbstractStrategy implements IStrategy {
 
   protected final ReadOnlyReversiModel reversiModel;
@@ -20,12 +23,24 @@ public abstract class AbstractStrategy implements IStrategy {
   protected boolean isAvoidCorners;
   private HashMap<List<Integer>, Integer> coordinateMap = new HashMap<>();
 
+  /**
+   * A 'AbstractStrategy' constructor for a non-corners strategy.
+   * @param reversiModel a reversiModel.
+   * @param player a player turn.
+   */
   public AbstractStrategy(ReadOnlyReversiModel reversiModel, PlayerTurn player) {
     this.reversiModel = reversiModel;
     this.player = player;
   }
 
-  public AbstractStrategy(ReadOnlyReversiModel reversiModel, PlayerTurn player, boolean isAvoidCorners) {
+  /**
+   * A 'AbstractStrategy' constructor for a corners strategy.
+   * @param reversiModel a reversiModel.
+   * @param player a player turn.
+   * @param isAvoidCorners should the strategy avoid corners.
+   */
+  public AbstractStrategy(ReadOnlyReversiModel reversiModel,
+                          PlayerTurn player, boolean isAvoidCorners) {
     this.reversiModel = reversiModel;
     this.player = player;
     this.isAvoidCorners = isAvoidCorners;
@@ -38,7 +53,6 @@ public abstract class AbstractStrategy implements IStrategy {
         try {
           DiscColor currentDiscColor = this.reversiModel.getDiscAt(i,j).getColor();
           if (currentDiscColor == DiscColor.FACEDOWN) {
-            System.out.println("X: " + i + " Y: " + j);
             res.add(new ArrayList<>(Arrays.asList(i,j)));
           }
         } catch (IllegalArgumentException iae) {
@@ -57,6 +71,8 @@ public abstract class AbstractStrategy implements IStrategy {
         return DiscColor.BLACK;
       case BLACK:
         return DiscColor.WHITE;
+      default:
+        // do nothing
     }
     return null;
   }
@@ -75,7 +91,7 @@ public abstract class AbstractStrategy implements IStrategy {
             res.add(new ArrayList<>(Arrays.asList(x, y)));
           }
         } catch (IllegalArgumentException iae) {
-
+          System.out.println("null cell encountered");
         }
       }
     }
@@ -85,12 +101,13 @@ public abstract class AbstractStrategy implements IStrategy {
   protected int getLengthOfMove(List<List<List<Integer>>> move) {
     int length = 0;
     for (List<List<Integer>> innerList : move) {
-        length += innerList.size();
+      length += innerList.size();
     }
     return length;
   }
 
-  protected List<Integer> getLongestAndMostUpLeftFromMap(HashMap<List<Integer>, List<List<List<Integer>>>> positionMoveMap) {
+  protected List<Integer> getLongestAndMostUpLeftFromMap(HashMap<List<Integer>,
+          List<List<List<Integer>>>> positionMoveMap) {
     List<List<Integer>> res = new ArrayList<>();
     int largestMoveLength = Integer.MIN_VALUE;
     for (Map.Entry<List<Integer>, List<List<List<Integer>>>> entry : positionMoveMap.entrySet()) {
@@ -120,6 +137,7 @@ public abstract class AbstractStrategy implements IStrategy {
       return new ArrayList<>(Arrays.asList(mostLeftX,mostLeftY));
     }
   }
+
   protected List<Integer> getUpLeftMostInMove(List<List<List<Integer>>> move) {
     int mostLeftX = Integer.MAX_VALUE;
     int mostLeftY = Integer.MAX_VALUE;
@@ -164,7 +182,8 @@ public abstract class AbstractStrategy implements IStrategy {
   }
 
   // closest is determined by the sum of the distance from a corner
-  protected int getClosestCoordinateToCorner(List<List<List<Integer>>> move, HashMap<Integer, List<Integer>> cornerMap) {
+  protected int getClosestCoordinateToCorner(List<List<List<Integer>>> move,
+                                             HashMap<Integer, List<Integer>> cornerMap) {
     int closestDistanceToACorner = Integer.MAX_VALUE;
     for (List<List<Integer>> innerList: move) {
       for (List<Integer> pos: innerList) {
@@ -183,6 +202,7 @@ public abstract class AbstractStrategy implements IStrategy {
     }
     return closestDistanceToACorner;
   }
+
   protected boolean moveIsAdjacentToCorner(List<List<List<Integer>>> moveFromPosition,
                                            HashMap<Integer, List<Integer>> cornerMap) {
     for (List<List<Integer>> innerList: moveFromPosition) {
@@ -195,7 +215,9 @@ public abstract class AbstractStrategy implements IStrategy {
     return false;
   }
 
-  protected boolean adjacentPositionInMap(List<Integer> position, HashMap<Integer, List<Integer>> cornerMap) {
+
+  protected boolean adjacentPositionInMap(List<Integer> position, HashMap<Integer,
+          List<Integer>> cornerMap) {
     int x = position.get(0);
     int y = position.get(1);
     for (MoveDirection md: MoveDirection.values()) {

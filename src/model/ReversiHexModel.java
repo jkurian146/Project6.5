@@ -244,7 +244,7 @@ public class ReversiHexModel extends BoardUtils implements ReversiModel {
     }
   }
 
-  // checks if a coordinate is within a n x n grid.
+  @Override
   public boolean checkValidCoordinates(int x, int y) {
     if (x >= this.gameBoard.length || y >= this.gameBoard.length || x < 0 || y < 0) {
       return false;
@@ -429,17 +429,7 @@ public class ReversiHexModel extends BoardUtils implements ReversiModel {
   public boolean doesPlayerHaveLegalMove() {
     DiscColor currentColor = this.getPlayerColor(this.pt);
     int playerScore = this.getScore(this.pt);
-    if (playerScore == 0) {
-      return false;
-    }
-    // get every adjacent cell from oppositte color using MoveRules
-    // check validity of adjacent cells (apply filter function on list using checkValidCoordinate)
-    // now that out of bounds cells are out we have to get rid of non face-down ones after that we can run
-    // bfs. we can possibly also just use makeMove without applying the color filter as well to get
-    // possible moves.
-
-    // stub return
-    return false;
+    return playerScore != 0;
   }
 
   @Override

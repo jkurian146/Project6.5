@@ -6,15 +6,27 @@ import java.util.Map;
 import discs.DiscColor;
 import strategy.IStrategy;
 
+/**
+ * A 'Player' represents a player it can either be an AI or regular player.
+ * Overloaded constructors are used to represent the condition.
+ */
 public class Player {
   private final PlayerTurn playerTurn;
   private IStrategy iStrategy;
   private final Map<PlayerTurn, DiscColor> playerColorMap;
+
+  /**
+   * A 'Player' represents a player instantiation without a strategy (non-ai).
+   */
   public Player(PlayerTurn playerTurn) {
     this.playerTurn = playerTurn;
     this.playerColorMap = setUpColorMap();
 
   }
+
+  /**
+   * A 'Player' represents a player instantiation with a strategy (ai).
+   */
   public Player(PlayerTurn playerTurn, IStrategy iStrategy) {
     this.playerTurn = playerTurn;
     this.iStrategy = iStrategy;
@@ -35,6 +47,7 @@ public class Player {
   public DiscColor getPlayerColor() {
     return this.playerColorMap.get(this.getPlayerTurn());
   }
+
   public IStrategy getIStrategy() {
     return this.iStrategy;
   }

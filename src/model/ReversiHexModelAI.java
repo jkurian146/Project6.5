@@ -4,8 +4,6 @@ package model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import discs.Disc;
 import player.Player;
 import player.PlayerTurn;
 import strategy.CornersStrategy;
@@ -14,6 +12,9 @@ import strategy.MaximizeCaptureStrategy;
 import strategy.MiniMaxStrategy;
 import strategy.StrategyType;
 
+/**
+ * A 'ReversiHexModel' defines a hexagonal Reversi game with an AI player.
+ */
 public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
 
   private final StrategyType strategyType;
@@ -23,6 +24,10 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
   private List<List<Integer>> allMoves;
   private boolean firstRun;
 
+  /**
+   * A 'ReversiHexModel' defines a hexagonal Reversi game with an AI player.
+   * @param strategyType a strategy that the AI should implement.
+   */
   public ReversiHexModelAI(StrategyType strategyType) {
     super();
     this.strategyType = strategyType;
@@ -48,26 +53,32 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
         throw new IllegalStateException("Can't Create an AI without a strategy");
     }
   }
+
   @Override
   public void makeMove(int x, int y) {
     if (!this.isGameOver()) {
       if (this.firstRun) {
-        this.gameStates.add(this);
+        this.gameStates.add(createCopyOfModel(this));
         this.moveNonAi(x, y);
-        this.gameStates.add(this);
+        this.gameStates.add(createCopyOfModel(this));
         this.moveAi();
-        this.gameStates.add(this);
+        this.gameStates.add(createCopyOfModel(this));
         this.firstRun = false;
       } else {
         this.moveNonAi(x, y);
-        this.gameStates.add(this);
+        this.gameStates.add(createCopyOfModel(this));
         this.moveAi();
-        this.gameStates.add(this);
+        this.gameStates.add(createCopyOfModel(this));
         this.firstRun = false;
       }
     } else {
       throw new IllegalStateException("Can't call move after game is over");
     }
+  }
+
+  private ReadOnlyReversiModel createCopyOfModel(ReversiHexModel rorm) {
+    ReadOnlyReversiModel copy = rorm;
+    return copy;
   }
 
   private void moveNonAi(int x, int y) {
@@ -100,6 +111,7 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
       }
     }
   }
+
   @Override
   public void pass() {
     if (super.pt == this.player1.getPlayerTurn()) {

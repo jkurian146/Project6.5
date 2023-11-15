@@ -2,12 +2,20 @@ package strategy;
 
 import java.util.List;
 
-import model.ReadOnlyReversiModel;
-
+/**
+ * Represents a General Interface for a Strategy Implementation.
+ */
 public interface IStrategy {
 
+  /**
+   * execute a strategy based on the strategy implementation.
+   * @return a position as a List for the model to execute.
+   */
   List<Integer> executeStrategy();
 
+  /**
+   * Gets a strategies' implementation type.
+   */
   StrategyType getStrategyType();
 
 }

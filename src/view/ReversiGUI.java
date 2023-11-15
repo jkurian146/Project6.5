@@ -16,12 +16,19 @@ import model.ReversiHexModel;
 import model.ReversiHexModelAI;
 import strategy.StrategyType;
 
+/**
+ * The `ReversiGUI` class represents the view component in a Reversi game.
+ * It is responsible for rendering and displaying the game state to the players.
+ */
 public class ReversiGUI extends JFrame implements ReversiView {
   private final ReadOnlyReversiModel model;
   private final JButton[][] boardButtons;
   private int prevX = -1;
   private int prevY = -1;
 
+  /**
+   * A ReversiGUI constructor.
+   */
   public ReversiGUI(ReadOnlyReversiModel model) {
     this.model = model;
 
@@ -105,30 +112,38 @@ public class ReversiGUI extends JFrame implements ReversiView {
           }
 
           @Override
-          public void mouseClicked(MouseEvent e) {}
+          public void mouseClicked(MouseEvent e) {
+            // needs to be overridden.
+          }
 
           @Override
-          public void mouseReleased(MouseEvent e) {}
+          public void mouseReleased(MouseEvent e) {
+            // needs to be overridden.
+          }
 
           @Override
-          public void mouseEntered(MouseEvent e) {}
+          public void mouseEntered(MouseEvent e) {
+            // needs to be overridden.
+          }
 
           @Override
-          public void mouseExited(MouseEvent e) {}
+          public void mouseExited(MouseEvent e) {
+            // needs to be overridden.
+          }
 
         });
 
         boardButtons[i][j].addKeyListener(new KeyListener() {
           @Override
           public void keyTyped(KeyEvent e) {
-
+            // needs to be overridden.
           }
 
           @Override
           public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_SPACE) {
               System.out.println("Spacebar pressed, player wishes to pass");
-              if(!(prevX == - 1 && prevY == - 1)) {
+              if (!(prevX == - 1 && prevY == - 1)) {
                 discSelectorHelper(boardButtons[prevY][prevX], prevX, prevY);
                 prevX = - 1;
                 prevY = - 1;
@@ -136,7 +151,7 @@ public class ReversiGUI extends JFrame implements ReversiView {
             }
 
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-              if(!(prevX == - 1 && prevY == - 1)) {
+              if (!(prevX == - 1 && prevY == - 1)) {
                 System.out.println("Enter key pressed, player wishes to make a move to the disc at"
                         + " (" + prevX + ", " + prevY + ")");
 
@@ -151,7 +166,7 @@ public class ReversiGUI extends JFrame implements ReversiView {
 
           @Override
           public void keyReleased(KeyEvent e) {
-
+            // needs to be overridden.
           }
         });
         add(boardButtons[i][j]);
@@ -184,6 +199,9 @@ public class ReversiGUI extends JFrame implements ReversiView {
     }
   }
 
+  /**
+   * The Render Method is needed for displaying the view.
+   */
   public void render() {
     Disc[][] board = model.getCurrentBoardState();
     for (int i = 0; i < board.length; i++) {
@@ -247,12 +265,14 @@ public class ReversiGUI extends JFrame implements ReversiView {
     return new ImageIcon(hexImage);
   }
 
+  /**
+   * A main method that can be used as an entry point for a user.
+   */
   public static void main(String[] args) {
-    ReversiHexModelAI model = new ReversiHexModelAI(StrategyType.GOFORCORNER);
+    ReversiHexModelAI model = new ReversiHexModelAI(StrategyType.MINIMAX);
     //ReversiHexModel model = new ReversiHexModel();
     model.startGame(7);
-    model.makeMove(2,4);
-    model.makeMove(3,1);
+    model.makeMove(2,2);
     ReversiGUI gui = new ReversiGUI(model);
     gui.render();
   }
