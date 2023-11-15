@@ -476,7 +476,7 @@ public class ReversiHexModel extends BoardUtils implements ReversiModel {
   }
 
   @Override
-  public List<ReversiModel> getGameStates() {
+  public List<ReadOnlyReversiModel> getGameStates() {
     return null;
   }
 

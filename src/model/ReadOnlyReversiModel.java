@@ -94,7 +94,7 @@ public interface ReadOnlyReversiModel {
 
   boolean checkValidCoordinates(int x, int y);
 
-  List<ReversiModel> getGameStates();
+  List<ReadOnlyReversiModel> getGameStates();
 
   List<List<Integer>> getMoves();
 

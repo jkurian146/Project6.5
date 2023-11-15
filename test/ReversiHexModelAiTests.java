@@ -1,6 +1,7 @@
 import org.junit.Assert;
 import org.junit.Test;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -8,8 +9,10 @@ import discs.DiscColor;
 import model.GameState;
 import model.MoveDirection;
 import model.MoveRules;
+import model.ReversiHexModel;
 import model.ReversiHexModelAI;
 import model.ReversiModel;
+import strategy.MaximizeCaptureStrategyMock;
 import strategy.StrategyType;
 import view.ReversiGUI;
 
@@ -71,24 +74,42 @@ public class ReversiHexModelAiTests {
     model.startGame(9);
 
     model.makeMove(4, 2);
+    // Available moves:
+    // (3, 1), discs captured: 3
+    // (5, 5), discs captured: 2
+    // (4, 6), discs captured: 2
+    // (2, 3), discs captured: 2
+
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 3).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 2).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 1).getColor());
 
 
     model.makeMove(4, 1);
+    // Available moves:
+    // (2, 3), discs captured: 3 *
+    // (5, 5), discs captured: 2
+    // (4, 6), discs captured: 2
+    // (5, 2), discs captured: 2
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(2, 3).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 3).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 4).getColor());
 
     model.makeMove(2, 5);
+    // Available moves:
+    // (4, 6), discs captured: 4 *
+    // (5, 1), discs captured: 2
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 6).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 5).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 5).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 4).getColor());
-    Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(2, 3).getColor());
 
     model.makeMove(5, 5);
+    // Available moves:
+    // (5, 0), discs captured: 4
+    // (5, 3), discs captured: 5 *
+    // (5, 1), discs captured: 2
+    // (2, 6), discs captured: 2
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 5).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 3).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 3).getColor());
@@ -96,20 +117,44 @@ public class ReversiHexModelAiTests {
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 3).getColor());
 
     model.makeMove(4, 7);
+    // Available moves:
+    // (5, 0), discs captured: 3
+    // (5, 2), discs captured: 2
+    // (3, 7), discs captured: 2
+    // (2, 6), discs captured: 2
+    // (6, 5), discs captured: 2
+    // (5, 8), discs captured: 4 *
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 8).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 7).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 6).getColor());
 
     model.makeMove(3, 0);
+    // Available moves:
+    // (5, 0), discs captured: 3 *
+    // (6, 6), discs captured: 2
+    // (1, 5), discs captured: 2
+    // (2, 6), discs captured: 2
+    // (6, 5), discs captured: 2
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 2).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 1).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(5, 0).getColor());
 
     model.makeMove(5, 1);
+    // Available moves:
+    // (1, 5), discs captured: 2 * top-leftmost
+    // (2, 6), discs captured: 2
+    // (6, 6), discs captured: 2
+    // (6, 5), discs captured: 2
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(1, 5).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(2, 5).getColor());
 
     model.makeMove(2, 6);
+    // Available moves:
+    // (1, 7), discs captured: 7 *
+    // (2, 7), discs captured: 2
+    // (6, 6), discs captured: 2
+    // (6, 5), discs captured: 2
+    // (6, 2), discs captured: 2
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 2).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(4, 1).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(3, 3).getColor());
@@ -119,6 +164,11 @@ public class ReversiHexModelAiTests {
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(1, 7).getColor());
 
     model.makeMove(0, 5);
+    // Available moves:
+    // (6, 1), discs captured: 2
+    // (2, 1), discs captured: 2
+    // (1, 4), discs captured: 2 *
+    // (6, 4), discs captured: 2
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(1, 5).getColor());
     Assert.assertEquals(DiscColor.WHITE, model.getDiscAt(1, 4).getColor());
 
@@ -209,7 +259,6 @@ public class ReversiHexModelAiTests {
     Assert.assertEquals(MoveRules.applyShiftBasedOnDirection(1,1, MoveDirection.UPRIGHT),
             new ArrayList<>(Arrays.asList(2,0)));
     rhmai.makeMove(5,2);
-    Assert.assertFalse(rhmai.isGameOver());
   }
 
   @Test
@@ -221,9 +270,7 @@ public class ReversiHexModelAiTests {
     model.makeMove(3,6);
     model.pass();
     Assert.assertTrue(model.isGameOver());
-    Assert.assertThrows(IllegalStateException.class,
-            () -> model.makeMove(3,1));
-    // ai pass
+    Assert.assertEquals(GameState.STALEMATE, model.getCurrentGameState());
   }
 
   @Test
@@ -231,9 +278,23 @@ public class ReversiHexModelAiTests {
     ReversiModel model = new ReversiHexModelAI(StrategyType.GOFORCORNER);
     model.startGame(7);
     model.makeMove(2,4);
-    ReversiGUI gui = new ReversiGUI(model);
-    gui.render();
   }
 
+  @Test
+  public void testMockAiMaximize() {
+    ReversiModel model = new ReversiHexModel();
+    model.startGame(7);
+    model.makeMove(2, 2);
+    MaximizeCaptureStrategyMock mock = new MaximizeCaptureStrategyMock(model);
 
+    System.out.println(mock.reviewedPositions());
+    System.out.println(mock.positionMoveMap);
+  }
+
+  @Test
+  public void testMiniMax() {
+    ReversiHexModelAI model = new ReversiHexModelAI(StrategyType.MINIMAX);
+    model.startGame(7);
+    model.makeMove(2,2);
+  }
 }

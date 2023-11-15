@@ -71,7 +71,7 @@ public class CornersStrategy extends AbstractStrategy {
         List<List<List<Integer>>> moveFromPosition = BoardUtils.bfs(super.reversiModel,
                 position.get(0), position.get(1));
         // avoid cells adjacent to corners
-        if (!moveIsAdjacentToCorner(moveFromPosition) && this.strategyType == StrategyType.AVOIDCORNER) {
+        if (!moveIsAdjacentToCorner(moveFromPosition,this.cornerMap) && this.strategyType == StrategyType.AVOIDCORNER) {
           this.positionMoveMap.put(position,moveFromPosition);
         }
         // go for corners
@@ -80,8 +80,8 @@ public class CornersStrategy extends AbstractStrategy {
           if (moveInMap == null) {
             this.positionMoveMap.put(position,moveFromPosition);
           } else {
-            int mapClosest = getClosestCoordinateToCorner(moveInMap);
-            int currClosest = getClosestCoordinateToCorner(moveFromPosition);
+            int mapClosest = getClosestCoordinateToCorner(moveInMap,this.cornerMap);
+            int currClosest = getClosestCoordinateToCorner(moveFromPosition,this.cornerMap);
             if (currClosest < mapClosest) {
               this.positionMoveMap.put(position,moveFromPosition);
             }
@@ -93,78 +93,11 @@ public class CornersStrategy extends AbstractStrategy {
                     != DiscColor.FACEDOWN);
     this.positionMoveMap.entrySet().removeIf(entry -> entry.getValue().isEmpty());
     return (this.strategyType == StrategyType.AVOIDCORNER) ?
-            getLongestAndMostUpLeftFromMap(this.positionMoveMap) : getMoveWithClosestCoordinateFromMap(this.positionMoveMap);
+            getLongestAndMostUpLeftFromMap(this.positionMoveMap) :
+            getMoveWithClosestCoordinateFromMap(this.positionMoveMap,this.cornerMap);
   }
 
-  private List<Integer> getMoveWithClosestCoordinateFromMap(HashMap<List<Integer>,
-          List<List<List<Integer>>>> positionMoveMap) {
-    List<Integer> closestMoveToCorner = new ArrayList<>();
-    int closestDistanceToACorner = Integer.MAX_VALUE;
-    for (Map.Entry<List<Integer>, List<List<List<Integer>>>> entry : positionMoveMap.entrySet()) {
-      int currX = entry.getKey().get(0);
-      int currY = entry.getKey().get(1);
-      for (List<Integer> corner: this.cornerMap.values()) {
-        int cornerX = corner.get(0);
-        int cornerY = corner.get(1);
-        int xDistance = Math.abs(cornerX - currX);
-        int yDistance = Math.abs(cornerY - currY);
-        if (xDistance + yDistance < closestDistanceToACorner) {
-          closestDistanceToACorner = xDistance + yDistance;
-          closestMoveToCorner = entry.getKey();
-        } else if (xDistance + yDistance == closestDistanceToACorner) {
-          int mapX = entry.getKey().get(0);
-          int mapY = entry.getKey().get(1);
-          if (currX < mapX || (currX == mapX && currY < mapY)) {
-            closestMoveToCorner = entry.getKey();
-          }
-        }
-      }
-    }
-    return closestMoveToCorner;
-  }
 
-  // closest is determined by the sum of the distance from a corner
-  private int getClosestCoordinateToCorner(List<List<List<Integer>>> move) {
-    int closestDistanceToACorner = Integer.MAX_VALUE;
-    for (List<List<Integer>> innerList: move) {
-      for (List<Integer> pos: innerList) {
-        int x = pos.get(0);
-        int y = pos.get(1);
-        for (List<Integer> corner: this.cornerMap.values()) {
-          int cornerX = corner.get(0);
-          int cornerY = corner.get(1);
-          int xDistance = Math.abs(cornerX - x);
-          int yDistance = Math.abs(cornerY - y);
-          if (xDistance + yDistance < closestDistanceToACorner) {
-            closestDistanceToACorner = xDistance + yDistance;
-          }
-        }
-      }
-    }
-    return closestDistanceToACorner;
-  }
-  private boolean moveIsAdjacentToCorner(List<List<List<Integer>>> moveFromPosition) {
-    for (List<List<Integer>> innerList: moveFromPosition) {
-      for (List<Integer> position: innerList) {
-        if (adjacentPositionInMap(position)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  private boolean adjacentPositionInMap(List<Integer> position) {
-    int x = position.get(0);
-    int y = position.get(1);
-    for (MoveDirection md: MoveDirection.values()) {
-      List<Integer> adjacentPos = MoveRules.applyShiftBasedOnDirection(x,y,md);
-      if (this.cornerMap.values().contains(adjacentPos)) {
-        return true;
-      }
-    }
-    return false;
-  }
   @Override
   public StrategyType getStrategyType() {
     return this.strategyType;

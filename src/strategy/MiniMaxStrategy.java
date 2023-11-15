@@ -24,9 +24,11 @@ public class MiniMaxStrategy extends AbstractStrategy {
     if (lastMove.equals(executeMaximize(getLastState))) {
 
     } else if (lastMove.equals(executeAvoidCorners(getLastState))) {
-
+      executeAvoidCorners(this.reversiModel);
     } else if (lastMove.equals(executeGoForCorner(getLastState))) {
-
+      executeGoForCorner(this.reversiModel);
+    } else {
+      executeMaximize(this.reversiModel);
     }
     return null;
   }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import discs.Disc;
 import player.Player;
 import player.PlayerTurn;
 import strategy.CornersStrategy;
@@ -18,7 +19,7 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
   private final StrategyType strategyType;
   private final Player player1;
   private Player player2;
-  private List<ReversiModel> gameStates;
+  private List<ReadOnlyReversiModel> gameStates;
   private List<List<Integer>> allMoves;
   private boolean firstRun;
 
@@ -112,7 +113,7 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
   }
 
   @Override
-  public List<ReversiModel> getGameStates() {
+  public List<ReadOnlyReversiModel> getGameStates() {
     return this.gameStates;
   }
 

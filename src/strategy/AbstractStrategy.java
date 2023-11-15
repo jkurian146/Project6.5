@@ -135,4 +135,75 @@ public abstract class AbstractStrategy implements IStrategy {
     }
     return new ArrayList<>(Arrays.asList(mostLeftX,mostLeftY));
   }
+
+  protected List<Integer> getMoveWithClosestCoordinateFromMap(HashMap<List<Integer>,
+          List<List<List<Integer>>>> positionMoveMap, HashMap<Integer, List<Integer>> cornerMap) {
+    List<Integer> closestMoveToCorner = new ArrayList<>();
+    int closestDistanceToACorner = Integer.MAX_VALUE;
+    for (Map.Entry<List<Integer>, List<List<List<Integer>>>> entry : positionMoveMap.entrySet()) {
+      int currX = entry.getKey().get(0);
+      int currY = entry.getKey().get(1);
+      for (List<Integer> corner: cornerMap.values()) {
+        int cornerX = corner.get(0);
+        int cornerY = corner.get(1);
+        int xDistance = Math.abs(cornerX - currX);
+        int yDistance = Math.abs(cornerY - currY);
+        if (xDistance + yDistance < closestDistanceToACorner) {
+          closestDistanceToACorner = xDistance + yDistance;
+          closestMoveToCorner = entry.getKey();
+        } else if (xDistance + yDistance == closestDistanceToACorner) {
+          int mapX = closestMoveToCorner.get(0);
+          int mapY = closestMoveToCorner.get(1);
+          if (currX < mapX || (currX == mapX && currY < mapY)) {
+            closestMoveToCorner = entry.getKey();
+          }
+        }
+      }
+    }
+    return closestMoveToCorner;
+  }
+
+  // closest is determined by the sum of the distance from a corner
+  protected int getClosestCoordinateToCorner(List<List<List<Integer>>> move, HashMap<Integer, List<Integer>> cornerMap) {
+    int closestDistanceToACorner = Integer.MAX_VALUE;
+    for (List<List<Integer>> innerList: move) {
+      for (List<Integer> pos: innerList) {
+        int x = pos.get(0);
+        int y = pos.get(1);
+        for (List<Integer> corner: cornerMap.values()) {
+          int cornerX = corner.get(0);
+          int cornerY = corner.get(1);
+          int xDistance = Math.abs(cornerX - x);
+          int yDistance = Math.abs(cornerY - y);
+          if (xDistance + yDistance < closestDistanceToACorner) {
+            closestDistanceToACorner = xDistance + yDistance;
+          }
+        }
+      }
+    }
+    return closestDistanceToACorner;
+  }
+  protected boolean moveIsAdjacentToCorner(List<List<List<Integer>>> moveFromPosition,
+                                           HashMap<Integer, List<Integer>> cornerMap) {
+    for (List<List<Integer>> innerList: moveFromPosition) {
+      for (List<Integer> position: innerList) {
+        if (adjacentPositionInMap(position,cornerMap)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  protected boolean adjacentPositionInMap(List<Integer> position, HashMap<Integer, List<Integer>> cornerMap) {
+    int x = position.get(0);
+    int y = position.get(1);
+    for (MoveDirection md: MoveDirection.values()) {
+      List<Integer> adjacentPos = MoveRules.applyShiftBasedOnDirection(x,y,md);
+      if (cornerMap.values().contains(adjacentPos)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
