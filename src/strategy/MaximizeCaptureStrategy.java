@@ -31,11 +31,9 @@ public class MaximizeCaptureStrategy extends AbstractStrategy {
   @Override
   public List<Integer> executeStrategy() {
     HashMap<List<Integer>, List<List<List<Integer>>>> positionMoveMap = new HashMap<>();
-    List<List<List<Integer>>> validPositions = getPositionsForBFS();
+    List<List<Integer>> validPositions = getPositionsForBFS();
 
-    for (List<List<Integer>> innerList : validPositions) {
-      // this inner list will contain all adjacent cells to a non-empty opposite color
-      for (List<Integer> position : innerList) {
+      for (List<Integer> position : validPositions) {
         List<List<List<Integer>>> moveFromPosition = BoardUtils.bfs(this.reversiModel,
                 position.get(0), position.get(1));
         // add a position and the move set to the map if the position doesn't exist
@@ -63,7 +61,7 @@ public class MaximizeCaptureStrategy extends AbstractStrategy {
 
         }
       }
-    }
+    getLongestFromMap(positionMoveMap);
     return getLongestAndMostUpLeftFromMap(positionMoveMap);
   }
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import discs.Disc;
 import discs.DiscColor;
@@ -11,13 +12,12 @@ import model.BoardUtils;
 import model.MoveDirection;
 import model.MoveRules;
 import model.ReadOnlyReversiModel;
-import player.Player;
 import player.PlayerTurn;
 
 
 public class CornersStrategy extends AbstractStrategy {
   private final HashMap<List<Integer>, List<List<List<Integer>>>> positionMoveMap;
-  private final List<List<List<Integer>>> positionsForBfs;
+  private final List<List<Integer>> positionsForBfs;
   private final HashMap<Integer, List<Integer>> cornerMap;
   private final StrategyType strategyType;
 
@@ -67,27 +67,86 @@ public class CornersStrategy extends AbstractStrategy {
   }
   @Override
   public List<Integer> executeStrategy() {
-    List<List<List<Integer>>> validPositions = getPositionsForBFS();
-    for (List<List<Integer>> innerList : validPositions) {
+    List<List<Integer>> validPositions = getPositionsForBFS();
       // this inner list will contain all adjacent cells to a non-empty opposite color
-      for (List<Integer> position : innerList) {
+      for (List<Integer> position : validPositions) {
         // every possible move from a singular position
-        List<List<List<Integer>>> moveFromPosition = BoardUtils.bfs(this.reversiModel,
+        List<List<List<Integer>>> moveFromPosition = BoardUtils.bfs(super.reversiModel,
                 position.get(0), position.get(1));
         // avoid cells adjacent to corners
-        if (!moveIsAdjacentToCorner(moveFromPosition) && this.isAvoidCorners) {
+        if (!moveIsAdjacentToCorner(moveFromPosition) && this.strategyType == StrategyType.AVOIDCORNER) {
           this.positionMoveMap.put(position,moveFromPosition);
         }
         // go for corners
-        else if (!this.isAvoidCorners) {
+        else if (this.strategyType == StrategyType.GOFORCORNER) {
+          List<List<List<Integer>>> moveInMap = this.positionMoveMap.get(position);
+          if (moveInMap == null) {
+            this.positionMoveMap.put(position,moveFromPosition);
+          } else {
+            int mapClosest = getClosestCoordinateToCorner(moveInMap);
+            int currClosest = getClosestCoordinateToCorner(moveFromPosition);
+            if (currClosest < mapClosest) {
+              this.positionMoveMap.put(position,moveFromPosition);
+            }
+          }
+        }
+      }
+    this.positionMoveMap.entrySet().removeIf(entry ->
+            this.reversiModel.getDiscAt(entry.getKey().get(0), entry.getKey().get(1)).getColor()
+                    != DiscColor.FACEDOWN);
+    this.positionMoveMap.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+    return (this.strategyType == StrategyType.AVOIDCORNER) ?
+            getLongestAndMostUpLeftFromMap(this.positionMoveMap) : getMoveWithClosestCoordinateFromMap(this.positionMoveMap);
+  }
 
+  private List<Integer> getMoveWithClosestCoordinateFromMap(HashMap<List<Integer>,
+          List<List<List<Integer>>>> positionMoveMap) {
+    List<Integer> closestMoveToCorner = new ArrayList<>();
+    int closestDistanceToACorner = Integer.MAX_VALUE;
+    for (Map.Entry<List<Integer>, List<List<List<Integer>>>> entry : positionMoveMap.entrySet()) {
+      int currX = entry.getKey().get(0);
+      int currY = entry.getKey().get(1);
+      for (List<Integer> corner: this.cornerMap.values()) {
+        int cornerX = corner.get(0);
+        int cornerY = corner.get(1);
+        int xDistance = Math.abs(cornerX - currX);
+        int yDistance = Math.abs(cornerY - currY);
+        if (xDistance + yDistance < closestDistanceToACorner) {
+          closestDistanceToACorner = xDistance + yDistance;
+          closestMoveToCorner = entry.getKey();
+        } else if (xDistance + yDistance == closestDistanceToACorner) {
+
+          int mapX = entry.getKey().get(0);
+          int mapY = entry.getKey().get(1);
+          if (currX < mapX || (currX == mapX && currY < mapY)) {
+            closestMoveToCorner = entry.getKey();
+          }
         }
       }
     }
-    return getLongestAndMostUpLeftFromMap(this.positionMoveMap);
+    return closestMoveToCorner;
   }
 
-
+  // closest is determined by the sum of the distance from a corner
+  private int getClosestCoordinateToCorner(List<List<List<Integer>>> move) {
+    int closestDistanceToACorner = Integer.MAX_VALUE;
+    for (List<List<Integer>> innerList: move) {
+      for (List<Integer> pos: innerList) {
+        int x = pos.get(0);
+        int y = pos.get(1);
+        for (List<Integer> corner: this.cornerMap.values()) {
+          int cornerX = corner.get(0);
+          int cornerY = corner.get(1);
+          int xDistance = Math.abs(cornerX - x);
+          int yDistance = Math.abs(cornerY - y);
+          if (xDistance + yDistance < closestDistanceToACorner) {
+            closestDistanceToACorner = xDistance + yDistance;
+          }
+        }
+      }
+    }
+    return 0;
+  }
   private boolean moveIsAdjacentToCorner(List<List<List<Integer>>> moveFromPosition) {
     for (List<List<Integer>> innerList: moveFromPosition) {
       for (List<Integer> position: innerList) {

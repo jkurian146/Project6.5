@@ -1,4 +1,5 @@
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.lang.reflect.Array;
@@ -212,6 +213,7 @@ public class ReversiHexModelAiTests {
     Assert.assertEquals(MoveRules.applyShiftBasedOnDirection(1,1, MoveDirection.UPRIGHT),
             new ArrayList<>(Arrays.asList(2,0)));
     rhmai.makeMove(5,2);
+    Assert.assertFalse(rhmai.isGameOver());
   }
 
   @Test
@@ -221,6 +223,17 @@ public class ReversiHexModelAiTests {
     model.makeMove(2,4);
     model.makeMove(5,4);
     model.makeMove(3,6);
+    model.pass();
+    Assert.assertTrue(model.isGameOver());
+    Assert.assertThrows(IllegalStateException.class,
+            () -> model.makeMove(3,1));
+    // ai pass
   }
 
+  @Test
+  public void testAIGoForCorners() {
+    ReversiModel model = new ReversiHexModelAI(StrategyType.GOFORCORNER);
+    model.startGame(7);
+    model.makeMove(2,4);
+  }
 }

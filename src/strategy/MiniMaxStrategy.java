@@ -25,7 +25,7 @@ public class MiniMaxStrategy extends AbstractStrategy {
 
   @Override
   public List<Integer> executeStrategy() {
-    List<List<List<Integer>>> validPositions = getPositionsForBFS();
+    //List<List<List<Integer>>> validPositions = getPositionsForBFS();
     return null;
   }
 

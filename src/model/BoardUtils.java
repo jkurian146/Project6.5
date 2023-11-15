@@ -11,18 +11,18 @@ public class BoardUtils {
 
   public static List<List<List<Integer>>> bfs(ReadOnlyReversiModel rorm, int destX, int destY) {
     List<List<List<Integer>>> res = new ArrayList<>();
-    res.add(bfsHelper(rorm,destX,destY,MoveDirection.LEFT,new ArrayList<>(), true));
-    res.add(bfsHelper(rorm,destX,destY,MoveDirection.RIGHT, new ArrayList<>(), true));
-    res.add(bfsHelper(rorm,destX,destY,MoveDirection.UPLEFT, new ArrayList<>(), true));
-    res.add(bfsHelper(rorm,destX,destY,MoveDirection.UPRIGHT, new ArrayList<>(), true));
-    res.add(bfsHelper(rorm,destX,destY,MoveDirection.DOWNLEFT, new ArrayList<>(), true));
-    res.add(bfsHelper(rorm,destX,destY,MoveDirection.DOWNRIGHT, new ArrayList<>(), true));
+    for (MoveDirection md: MoveDirection.values()) {
+      List<List<Integer>> move = bfsHelper(rorm,destX,destY,md,new ArrayList<>(),true);
+      if (!move.stream().allMatch(List::isEmpty)) {
+        res.add(move);
+      }
+    }
     return res;
   }
 
   // A helper for bfs that determines coordinates for a move in a certain direction
   // returns an empty list if there are no moves for that direction
-  private static List<List<Integer>> bfsHelper(ReadOnlyReversiModel rorm,int x, int y, MoveDirection moveDirection,
+  private static List<List<Integer>> bfsHelper(ReadOnlyReversiModel rorm, int x, int y, MoveDirection moveDirection,
                                         List<List<Integer>> res, boolean firstPass) {
 
     while (true) {

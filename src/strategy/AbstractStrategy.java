@@ -18,6 +18,7 @@ public abstract class AbstractStrategy implements IStrategy {
   protected final ReadOnlyReversiModel reversiModel;
   protected final PlayerTurn player;
   protected boolean isAvoidCorners;
+  private HashMap<List<Integer>, Integer> coordinateMap = new HashMap<>();
   public AbstractStrategy(ReadOnlyReversiModel reversiModel, PlayerTurn player) {
     this.reversiModel = reversiModel;
     this.player = player;
@@ -29,19 +30,15 @@ public abstract class AbstractStrategy implements IStrategy {
     this.isAvoidCorners = isAvoidCorners;
   }
 
-  protected List<List<List<Integer>>> getPositionsForBFS() {
-    List<List<List<Integer>>> res = new ArrayList<>();
+  protected List<List<Integer>> getPositionsForBFS() {
+    List<List<Integer>> res = new ArrayList<>();
     for (int i = 0; i < this.reversiModel.getDimensions(); i++) {
       for (int j = 0; j < this.reversiModel.getDimensions(); j++) {
         try {
-          DiscColor currentDiscColor = this.reversiModel.getDiscAt(i, j).getColor();
-          DiscColor targetColor = getOppositeColor(this.reversiModel.getPlayerColor(this.player));
-          // we're looking for the opposite color of the currentPlayer because we can only
-          // capture cells that are of the opposite players color
-          if (currentDiscColor != DiscColor.FACEDOWN && currentDiscColor == targetColor) {
+          DiscColor currentDiscColor = this.reversiModel.getDiscAt(i,j).getColor();
+          if (currentDiscColor == DiscColor.FACEDOWN) {
             System.out.println("X: " + i + " Y: " + j);
-            List<List<Integer>> allAdjacentEmpty = getAllAdjacent(i,j);
-            res.add(allAdjacentEmpty);
+            res.add(new ArrayList<>(Arrays.asList(i,j)));
           }
         } catch (IllegalArgumentException iae) {
           // we encountered a null cell do nothing
@@ -66,16 +63,19 @@ public abstract class AbstractStrategy implements IStrategy {
   private List<List<Integer>> getAllAdjacent(int i, int j)  {
     List<List<Integer>> res = new ArrayList<>();
     for (MoveDirection moveDir : MoveDirection.values()) {
-      List<Integer> currCoordinate = MoveRules.applyShiftBasedOnDirection(i,j,moveDir);
+      List<Integer> currCoordinate = MoveRules.applyShiftBasedOnDirection(i, j, moveDir);
       int x = currCoordinate.get(0);
       int y = currCoordinate.get(1);
-      try {
-        Disc currDisc = this.reversiModel.getDiscAt(x,y);
-        if (currDisc.getColor() == DiscColor.FACEDOWN) {
-          res.add(new ArrayList<>(Arrays.asList(x,y)));
-        }
-      } catch (IllegalArgumentException iae) {
+      if (this.coordinateMap.get(new ArrayList<>(Arrays.asList(x, y))) == null) {
+        this.coordinateMap.put(new ArrayList<>(Arrays.asList(x, y)), 1);
+        try {
+          Disc currDisc = this.reversiModel.getDiscAt(x, y);
+          if (currDisc.getColor() == DiscColor.FACEDOWN) {
+            res.add(new ArrayList<>(Arrays.asList(x, y)));
+          }
+        } catch (IllegalArgumentException iae) {
 
+        }
       }
     }
     return res;
@@ -84,11 +84,26 @@ public abstract class AbstractStrategy implements IStrategy {
   protected int getLengthOfMove(List<List<List<Integer>>> move) {
     int length = 0;
     for (List<List<Integer>> innerList : move) {
-      length += innerList.size();
+        length += innerList.size();
     }
     return length;
   }
 
+  protected List<List<Integer>> getLongestFromMap(HashMap<List<Integer>, List<List<List<Integer>>>> positionMoveMap) {
+    List<List<Integer>> res = new ArrayList<>();
+    int largestMoveLength = Integer.MIN_VALUE;
+    for (Map.Entry<List<Integer>, List<List<List<Integer>>>> entry : positionMoveMap.entrySet()) {
+      int currMoveLength = this.getLengthOfMove(entry.getValue());
+      if (currMoveLength > largestMoveLength) {
+        largestMoveLength = currMoveLength;
+        res.clear();
+        res.add(entry.getKey());
+      } else if (currMoveLength == largestMoveLength) {
+        res.add(entry.getKey());
+      }
+    }
+    return res;
+  }
   protected List<Integer> getLongestAndMostUpLeftFromMap(HashMap<List<Integer>, List<List<List<Integer>>>> positionMoveMap) {
     List<List<Integer>> res = new ArrayList<>();
     int largestMoveLength = Integer.MIN_VALUE;

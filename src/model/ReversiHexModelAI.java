@@ -1,3 +1,4 @@
+
 package model;
 
 import java.util.HashMap;
@@ -46,8 +47,12 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
   }
   @Override
   public void makeMove(int x, int y) {
-    this.moveNonAi(x,y);
-    this.moveAi();
+    if (!this.isGameOver()) {
+      this.moveNonAi(x, y);
+      this.moveAi();
+    } else {
+      throw new IllegalStateException("Can't call move after game is over");
+    }
   }
 
   private void moveNonAi(int x, int y) {
@@ -68,12 +73,12 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
       inBounds = false;
     }
     if (!inBounds) {
-      pass();
+      this.pass();
     } else {
       try {
         super.makeMove(aiMove.get(0), aiMove.get(1));
-      } catch (IllegalStateException ise) {
-        pass();
+      } catch (IllegalStateException | IllegalArgumentException ise) {
+        this.pass();
       }
     }
   }
@@ -81,8 +86,10 @@ public class ReversiHexModelAI extends ReversiHexModel implements ReversiModel {
   public void pass() {
     if (super.pt == this.player1.getPlayerTurn()) {
       super.pt = this.player2.getPlayerTurn();
+      this.moveAi();
     } else {
       super.pt = this.player1.getPlayerTurn();
     }
+    this.playerAction.append("pass\n");
   }
 }
