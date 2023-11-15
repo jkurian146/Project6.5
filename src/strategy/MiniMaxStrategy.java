@@ -17,7 +17,7 @@ public class MiniMaxStrategy extends AbstractStrategy {
 
   @Override
   public List<Integer> executeStrategy() {
-    List<ReversiModel> gameStates = this.reversiModel.getGameStates();
+    List<ReadOnlyReversiModel> gameStates = this.reversiModel.getGameStates();
     ReadOnlyReversiModel getLastState = gameStates.get(gameStates.size() - 2);
     List<List<Integer>> moves = this.reversiModel.getMoves();
     List<Integer> lastMove = moves.get(moves.size() - 1);
